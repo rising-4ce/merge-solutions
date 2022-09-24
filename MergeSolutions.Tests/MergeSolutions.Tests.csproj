@@ -7,13 +7,78 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <Compile Remove="TestData\SolutionA\ClassLibrary1\Class1.cs" />
+    <Compile Remove="TestData\SolutionA\InDiskFolder\InDiskFolderClassLibrary\Class1.cs" />
+    <Compile Remove="TestData\SolutionA\InSolutionFolderClassLibrary\Class1.cs" />
+    <Compile Remove="TestData\SolutionB\ClassLibrary1\Class1.cs" />
+    <Compile Remove="TestData\SolutionB\InSolutionFolderClassLibraryB\Class1.cs" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Content Include="TestData\SolutionA\ClassLibrary1\Class1.cs">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Include="TestData\SolutionA\InDiskFolder\InDiskFolderClassLibrary\Class1.cs">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Include="TestData\SolutionA\InSolutionFolderClassLibrary\Class1.cs">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Include="TestData\SolutionB\ClassLibrary1\Class1.cs">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Include="TestData\SolutionB\InSolutionFolderClassLibraryB\Class1.cs">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+  </ItemGroup>
+
+  <ItemGroup>
+    <Content Include="TestData\SolutionB\SolutionB.sln">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+  </ItemGroup>
+
+  <ItemGroup>
+    <Content Include="TestData\SolutionB\InSolutionFolderClassLibraryB\InSolutionFolderClassLibraryB.csproj">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+  </ItemGroup>
+
+  <ItemGroup>
+    <Content Include="TestData\SolutionB\ClassLibrary1\ClassLibrary1.csproj">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+  </ItemGroup>
+
+  <ItemGroup>
+    <Content Include="TestData\SolutionA\SolutionA.sln">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+  </ItemGroup>
+
+  <ItemGroup>
+    <Content Include="TestData\SolutionA\InSolutionFolderClassLibrary\InSolutionFolderClassLibrary.csproj">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+  </ItemGroup>
+
+  <ItemGroup>
+    <None Include="TestData\SolutionA\ClassLibrary1\ClassLibrary1.csproj">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Include="TestData\SolutionA\InDiskFolder\InDiskFolderClassLibrary\InDiskFolderClassLibrary.csproj">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+  </ItemGroup>
+
+  <ItemGroup>
     <PackageReference Include="FluentAssertions" Version="6.7.0" />
     <PackageReference Include="Microsoft.NET.Test.Sdk" Version="17.3.1" />
     <PackageReference Include="xunit" Version="2.4.2" />
   </ItemGroup>
 
   <ItemGroup>
-    <Folder Include="TestData\" />
+    <ProjectReference Include="..\MergeSolutions.Core\MergeSolutions.Core.csproj" />
   </ItemGroup>
 
 </Project>

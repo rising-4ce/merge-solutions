@@ -26,15 +26,22 @@ namespace MergeSolutions.Core.Models
                     ? p.SolutionName
                     : PathHelpers.GetDirName(Path.GetDirectoryName(Path.GetDirectoryName(p.Location)) ?? "");
 
-            IEnumerable<IGrouping<string?, BaseProject>> groupedSolutions = projects.GroupBy(getActualSolutionName);
+            var groupedSolutions = projects.GroupBy(getActualSolutionName).Where(g => g.Key != null);
             foreach (var group in groupedSolutions)
             {
-                var dir = new ProjectDirectory(group.Key ?? "");
-                projects.Add(dir);
+                var root = new ProjectDirectory(group.Key ?? "");
+                projects.Add(root);
 
-                dir.NestedProjectsInfo = nestedSection;
-                nestedSection.Dirs.Add(dir);
-                dir.NestedProjects.AddRange(group.Select(pr => new ProjectRelationInfo(pr, dir)));
+                root.NestedProjectsInfo = nestedSection;
+                nestedSection.Dirs.Add(root);
+                root.NestedProjects.AddRange(group.Select(pr =>
+                {
+                    var nestedSectionDirs = pr.ProjectInfo.SolutionInfo?.NestedSection.Dirs;
+                    var parentGuid = nestedSectionDirs?.FirstOrDefault(d => d.NestedProjects.Any(p => p.Project.Guid == pr.Guid))
+                        ?.Guid;
+                    var subDir = group.FirstOrDefault(g => g.Guid == parentGuid) as ProjectDirectory;
+                    return new ProjectRelationInfo(pr, subDir ?? root);
+                }));
             }
         }
     }

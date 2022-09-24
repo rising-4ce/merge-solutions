@@ -6,10 +6,10 @@ namespace MergeSolutions.Core.Models
     {
         private const string DirPackageGuid = "{2150E333-8FDC-42A3-9474-1A3956D46DE8}";
 
-        public ProjectDirectory(string name, string? guid = null, string? packageGuid = null)
+        public ProjectDirectory(string name, string? guid = null, string? packageGuid = null, SolutionInfo? solutionInfo = null)
             : base(guid ?? "{" + System.Guid.NewGuid().ToString().ToUpper() + "}",
                 name,
-                new ProjectInfo(null, packageGuid ?? DirPackageGuid, Environment.NewLine))
+                new ProjectInfo(solutionInfo, packageGuid ?? DirPackageGuid, Environment.NewLine))
         {
             NestedProjects = new List<ProjectRelationInfo>();
         }

@@ -32,8 +32,7 @@ namespace MergeSolutions.Core.Parsers
 
             var captures = matcher
                 .Matches(source)
-                .Cast<Match>()
-                .SelectMany(m => m.Groups[LocationGroupName].Captures.Cast<Capture>())
+                .SelectMany(m => m.Groups[LocationGroupName].Captures)
                 .OrderByDescending(c => c.Index).ToArray();
 
             var result = source;

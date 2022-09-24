@@ -12,7 +12,7 @@
             return path.Substring(path.LastIndexOfAny(separators) + 1);
         }
 
-        public static bool IsWebSiteUrl(this string path)
+        public static bool IsWebSiteUrl(this string? path)
         {
             return path != null && (path.Contains(@"://") || path.Contains(@":\\"));
         }
@@ -34,7 +34,7 @@
         private static string EvaluateRelativePath(string mainDirPath, string absoluteFilePath)
         {
             var firstPathParts = mainDirPath.Trim(Path.DirectorySeparatorChar).Split(Path.DirectorySeparatorChar);
-            string[] secondPathParts = absoluteFilePath.Trim(Path.DirectorySeparatorChar).Split(Path.DirectorySeparatorChar);
+            var secondPathParts = absoluteFilePath.Trim(Path.DirectorySeparatorChar).Split(Path.DirectorySeparatorChar);
 
             var sameCounter = 0;
             for (var i = 0; i < Math.Min(firstPathParts.Length, secondPathParts.Length); i++)

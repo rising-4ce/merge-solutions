@@ -35,7 +35,7 @@ namespace MergeSolutions.Core.Models
                         info.SolutionInfo?.BaseDir ??
                         throw new InvalidOperationException($"Solution info is required for {name} from {relativeLocation}"),
                         relativeLocation))
-                : (BaseProject)new ProjectDirectory(name, guid, info.Package);
+                : (BaseProject)new ProjectDirectory(name, guid, info.Package, info.SolutionInfo);
 
             project.ProjectInfo.Project = project;
 

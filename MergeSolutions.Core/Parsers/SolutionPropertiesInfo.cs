@@ -5,7 +5,7 @@ namespace MergeSolutions.Core.Parsers
     public class SolutionPropertiesInfo
     {
         private static readonly Regex _rePlatforms =
-            new Regex(@"GlobalSection\(SolutionProperties\)\s=\spreSolution(?<Section>[\s\S]*?)EndGlobalSection",
+            new(@"GlobalSection\(SolutionProperties\)\s=\spreSolution(?<Section>[\s\S]*?)EndGlobalSection",
                 RegexOptions.Multiline | RegexOptions.Compiled);
 
         private readonly string _all;

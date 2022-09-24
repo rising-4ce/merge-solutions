@@ -5,25 +5,25 @@ namespace MergeSolutions.Core.Parsers
 {
     public class SolutionInfo
     {
-        private SolutionInfo(string name, string baseDir, SolutionPropertiesInfo propsSection, NestedProjectsInfo nestedSection)
+        private SolutionInfo(string name, string baseDir, SolutionPropertiesInfo propsSection)
         {
             Name = name;
             BaseDir = Path.GetFullPath(baseDir);
-            NestedSection = nestedSection;
             PropsSection = propsSection;
+            NestedSection = new NestedProjectsInfo();
         }
 
         public string BaseDir { get; }
 
         public string Name { get; }
 
+        public NestedProjectsInfo NestedSection { get; private set; }
+
         public List<BaseProject> Projects { get; private set; } = new();
 
-        public string? Text { get; private set; }
+        public SolutionPropertiesInfo PropsSection { get; }
 
-        private NestedProjectsInfo NestedSection { get; }
-
-        private SolutionPropertiesInfo PropsSection { get; }
+        public string? Text { get; private init; }
 
         public static SolutionInfo MergeSolutions(string newName, string baseDir, out string warnings,
             params SolutionInfo[] solutions)
@@ -32,7 +32,7 @@ namespace MergeSolutions.Core.Parsers
 
             warnings = SolutionDiagnostics.DiagnoseDupeGuids(solutions);
 
-            var mergedSln = new SolutionInfo(newName, baseDir, solutions[0].PropsSection, new NestedProjectsInfo())
+            var mergedSln = new SolutionInfo(newName, baseDir, solutions[0].PropsSection)
             {
                 Projects = allProjects
             };
@@ -50,25 +50,32 @@ namespace MergeSolutions.Core.Parsers
             var slnBaseDir = Path.GetDirectoryName(path);
             var props = SolutionPropertiesInfo.Parse(slnText);
 
-            var sln = new SolutionInfo(Path.GetFileNameWithoutExtension(path), slnBaseDir!, props, new NestedProjectsInfo())
+            var sln = new SolutionInfo(Path.GetFileNameWithoutExtension(path), slnBaseDir!, props)
             {
                 Text = slnText
             };
 
             sln.Projects = ProjectInfo.Parse(sln);
 
+            sln.NestedSection = NestedProjectsInfo.Parse(sln.Projects, slnText);
+
             return sln;
         }
 
         public void Save()
         {
-            File.WriteAllText(Path.Combine(BaseDir, Name + ".sln"), ToString());
+            var solutionContent = ToString();
+            File.WriteAllText(Path.Combine(BaseDir, Name + ".sln"), solutionContent);
         }
 
         public override string ToString()
         {
+            var projectsSection = string.Concat(Projects.Select(p => p.ProjectInfo));
             return $@"Microsoft Visual Studio Solution File, Format Version 12.00
-# Visual Studio Version 17{string.Concat(Projects.Select(p => p.ProjectInfo))}
+# Visual Studio Version 17
+VisualStudioVersion = 17.3.32901.215
+MinimumVisualStudioVersion = 10.0.40219.1
+{projectsSection}
 Global
 {PropsSection}
 {NestedSection}

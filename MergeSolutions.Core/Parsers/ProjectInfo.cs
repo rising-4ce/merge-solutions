@@ -7,17 +7,16 @@ namespace MergeSolutions.Core.Parsers
     public class ProjectInfo
     {
         private static readonly Regex _reSolutionItemPath =
-            new Regex(
-                @"ProjectSection\(SolutionItems\)\s=\spreProject(\s*(?<" + PathResolver.LocationGroupName + @">.*?)\s=\s(?<" +
+            new(@"ProjectSection\(SolutionItems\)\s=\spreProject(\s*(?<" + PathResolver.LocationGroupName + @">.*?)\s=\s(?<" +
                 PathResolver.LocationGroupName + @">.*?))*\s*EndProjectSection", RegexOptions.Multiline | RegexOptions.Compiled);
 
         private static readonly Regex _reWebsitePath =
-            new Regex(@"AspNetCompiler\.PhysicalPath\s=\s""(?<Path>.*?)""|SlnRelativePath\s=\s""(?<Path>.*?)""",
+            new(@"AspNetCompiler\.PhysicalPath\s=\s""(?<Path>.*?)""|SlnRelativePath\s=\s""(?<Path>.*?)""",
                 RegexOptions.Multiline | RegexOptions.Compiled);
 
         private static readonly Regex _reProjects =
-            new Regex(
-                @"Project1\(\""(?<Package>\{.*?\})\"".*?\""(?<Name>.*?)\"".*?\""(?<Project1>.*?)\"".*?\""(?<Guid>.*?)\""(?<All>[\s\S]*?)EndProject\s",
+            new(
+                @"Project\(\""(?<Package>\{.*?\})\"".*?\""(?<Name>.*?)\"".*?\""(?<Project1>.*?)\"".*?\""(?<Guid>.*?)\""(?<All>[\s\S]*?)EndProject\s",
                 RegexOptions.Multiline | RegexOptions.Compiled);
 
         private readonly string _all;
@@ -73,7 +72,7 @@ namespace MergeSolutions.Core.Parsers
             body = _pathResolver.Relocate(body, BaseDir, _reSolutionItemPath);
             body = _pathResolver.Relocate(body, BaseDir, _reWebsitePath);
 
-            return string.Format(@"{5}Project1(""{0}"") = ""{1}"", ""{2}"", ""{3}""{4}EndProject", Package, name, location, guid,
+            return string.Format(@"{5}Project(""{0}"") = ""{1}"", ""{2}"", ""{3}""{4}EndProject", Package, name, location, guid,
                 body, Environment.NewLine);
         }
     }
