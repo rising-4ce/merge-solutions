@@ -11,7 +11,8 @@ namespace MergeSolutions.Core.Parsers
             BaseDir = Path.GetFullPath(baseDir);
             PropsSection = propsSection;
             NestedSection = new NestedProjectsInfo();
-            PlatformsSection = new SolutionConfigurationPlatformsInfo();
+            SolutionPlatformsSection = new SolutionConfigurationPlatformsInfo();
+            ProjectPlatformsSection = new ProjectConfigurationPlatformsInfo();
         }
 
         public string BaseDir { get; }
@@ -20,11 +21,13 @@ namespace MergeSolutions.Core.Parsers
 
         public NestedProjectsInfo NestedSection { get; private set; }
 
-        public SolutionConfigurationPlatformsInfo PlatformsSection { get; private set; }
+        public ProjectConfigurationPlatformsInfo ProjectPlatformsSection { get; private set; }
 
         public List<BaseProject> Projects { get; private set; } = new();
 
         public SolutionPropertiesInfo PropsSection { get; }
+
+        public SolutionConfigurationPlatformsInfo SolutionPlatformsSection { get; private set; }
 
         public string? Text { get; private init; }
 
@@ -44,9 +47,13 @@ namespace MergeSolutions.Core.Parsers
                 Projects = allProjects
             };
 
-            var platformLines = allProjects.Where(p => p.ProjectInfo.SolutionInfo != null)
-                .SelectMany(p => p.ProjectInfo.SolutionInfo!.PlatformsSection.Lines).Distinct().ToArray();
-            mergedSln.PlatformsSection = new SolutionConfigurationPlatformsInfo(platformLines);
+            var lines = allProjects.Where(p => p.ProjectInfo.SolutionInfo != null)
+                .SelectMany(p => p.ProjectInfo.SolutionInfo!.SolutionPlatformsSection.Lines).Distinct().ToArray();
+            mergedSln.SolutionPlatformsSection = new SolutionConfigurationPlatformsInfo(lines);
+
+            lines = allProjects.Where(p => p.ProjectInfo.SolutionInfo != null)
+                .SelectMany(p => p.ProjectInfo.SolutionInfo!.ProjectPlatformsSection.Lines).Distinct().ToArray();
+            mergedSln.ProjectPlatformsSection = new ProjectConfigurationPlatformsInfo(lines);
 
             mergedSln.CreateNestedDirs()
                 .Projects.ForEach(pr => pr.ProjectInfo.SolutionInfo = mergedSln);
@@ -68,7 +75,8 @@ namespace MergeSolutions.Core.Parsers
 
             sln.Projects = ProjectInfo.Parse(sln);
             sln.NestedSection = NestedProjectsInfo.Parse(sln.Projects, slnText);
-            sln.PlatformsSection = SolutionConfigurationPlatformsInfo.Parse(slnText);
+            sln.SolutionPlatformsSection = SolutionConfigurationPlatformsInfo.Parse(slnText);
+            sln.ProjectPlatformsSection = ProjectConfigurationPlatformsInfo.Parse(slnText);
 
             return sln;
         }
@@ -88,7 +96,8 @@ VisualStudioVersion = 17.3.32901.215
 MinimumVisualStudioVersion = 10.0.40219.1
 {projectsSection}
 Global
-{PlatformsSection}
+{SolutionPlatformsSection}
+{ProjectPlatformsSection}
 {PropsSection}
 {NestedSection}
 EndGlobal
