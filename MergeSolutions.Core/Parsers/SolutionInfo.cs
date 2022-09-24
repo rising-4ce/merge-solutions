@@ -67,8 +67,8 @@ namespace MergeSolutions.Core.Parsers
 
         public override string ToString()
         {
-            return $@"Microsoft Visual Studio Solution File, Format Version 11.00
-# Visual Studio 2010{string.Concat(Projects.Select(p => p.ProjectInfo))}
+            return $@"Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio Version 17{string.Concat(Projects.Select(p => p.ProjectInfo))}
 Global
 {PropsSection}
 {NestedSection}
