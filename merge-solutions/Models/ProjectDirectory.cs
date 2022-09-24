@@ -12,12 +12,15 @@ namespace SolutionMerger.Models
         {
             Guid = guid ?? "{" + System.Guid.NewGuid().ToString().ToUpper() + "}";
             Name = name;
-            ProjectInfo = new ProjectInfo(null, packageGuid ?? DirPackageGuid, Environment.NewLine) { Project = this };
+            ProjectInfo = new ProjectInfo(null, packageGuid ?? DirPackageGuid, Environment.NewLine)
+            {
+                Project = this
+            };
             NestedProjects = new List<ProjectRelationInfo>();
         }
 
-        public override string Location { get { return Name; } }
+        public override string Location => Name;
+        public List<ProjectRelationInfo> NestedProjects { get; }
         public NestedProjectsInfo NestedProjectsInfo { get; set; }
-        public List<ProjectRelationInfo> NestedProjects { get; private set; }
     }
 }

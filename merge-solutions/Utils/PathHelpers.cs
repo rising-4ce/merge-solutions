@@ -15,11 +15,9 @@ namespace SolutionMerger.Utils
             return path.Substring(path.LastIndexOfAny(separators) + 1);
         }
 
-        public static string ResolveRelativePath(string baseDir, string absolutePath)
+        public static bool IsWebSiteUrl(this string path)
         {
-            return absolutePath.IsWebSiteUrl() || absolutePath.IsNonPath()
-                ? absolutePath
-                : EvaluateRelativePath(baseDir, absolutePath);
+            return path.Contains(@"://") || path.Contains(@":\\");
         }
 
         public static string ResolveAbsolutePath(string baseDir, string relativePath)
@@ -29,14 +27,11 @@ namespace SolutionMerger.Utils
                 : Path.GetFullPath(Path.Combine(baseDir, relativePath));
         }
 
-        public static bool IsWebSiteUrl(this string path)
+        public static string ResolveRelativePath(string baseDir, string absolutePath)
         {
-            return path.Contains(@"://") || path.Contains(@":\\");
-        }
-
-        private static bool IsNonPath(this string path)
-        {
-            return !(path.Contains(":") || path.Contains(@"\") || path.Contains("/"));
+            return absolutePath.IsWebSiteUrl() || absolutePath.IsNonPath()
+                ? absolutePath
+                : EvaluateRelativePath(baseDir, absolutePath);
         }
 
         private static string EvaluateRelativePath(string mainDirPath, string absoluteFilePath)
@@ -48,25 +43,33 @@ namespace SolutionMerger.Utils
             for (var i = 0; i < Math.Min(firstPathParts.Length, secondPathParts.Length); i++)
             {
                 if (!firstPathParts[i].ToLower().Equals(secondPathParts[i].ToLower()))
+                {
                     break;
+                }
 
                 sameCounter++;
             }
 
             if (sameCounter == 0)
+            {
                 return absoluteFilePath;
+            }
 
             var newPath = "";
             for (var i = sameCounter; i < firstPathParts.Length; i++)
             {
                 if (i > sameCounter)
+                {
                     newPath += Path.DirectorySeparatorChar;
+                }
 
                 newPath += "..";
             }
 
             if (newPath.Length == 0)
+            {
                 newPath = ".";
+            }
 
             for (var i = sameCounter; i < secondPathParts.Length; i++)
             {
@@ -75,6 +78,11 @@ namespace SolutionMerger.Utils
             }
 
             return newPath;
+        }
+
+        private static bool IsNonPath(this string path)
+        {
+            return !(path.Contains(":") || path.Contains(@"\") || path.Contains("/"));
         }
     }
 }

@@ -21,11 +21,12 @@ namespace SolutionMerger.Parsers
             Dirs = dirs ?? new List<ProjectDirectory>();
         }
 
+        public List<ProjectDirectory> Dirs { get; }
+
         public override string ToString()
         {
-            return string.Format("\tGlobalSection(NestedProjects) = preSolution{1}{0}\tEndGlobalSection", string.Concat(Dirs.SelectMany(p => p.NestedProjects)), Environment.NewLine);
+            return string.Format("\tGlobalSection(NestedProjects) = preSolution{1}{0}\tEndGlobalSection",
+                string.Concat(Dirs.SelectMany(p => p.NestedProjects)), Environment.NewLine);
         }
-
-        public List<ProjectDirectory> Dirs { get; private set; }
     }
 }

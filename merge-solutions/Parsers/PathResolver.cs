@@ -18,13 +18,19 @@ namespace SolutionMerger.Parsers
         public string Relocate(string source, string newBaseDir, Regex matcher)
         {
             if (newBaseDir == originalBaseDir)
+            {
                 return source;
+            }
 
             if (string.IsNullOrWhiteSpace(source))
+            {
                 return source;
+            }
 
             if (!matcher.IsMatch(source))
+            {
                 return source;
+            }
 
             var captures = matcher
                 .Matches(source)
@@ -35,10 +41,13 @@ namespace SolutionMerger.Parsers
             var result = source;
             foreach (var capture in captures)
             {
-                if(Path.IsPathRooted(capture.Value))
+                if (Path.IsPathRooted(capture.Value))
+                {
                     continue;
+                }
 
-                var newPath = PathHelpers.ResolveRelativePath(newBaseDir, PathHelpers.ResolveAbsolutePath(originalBaseDir, capture.Value));
+                var newPath = PathHelpers.ResolveRelativePath(newBaseDir,
+                    PathHelpers.ResolveAbsolutePath(originalBaseDir, capture.Value));
                 result = result.Substring(0, capture.Index) + newPath + result.Substring(capture.Index + capture.Length);
             }
 

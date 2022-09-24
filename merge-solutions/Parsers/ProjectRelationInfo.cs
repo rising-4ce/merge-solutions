@@ -5,6 +5,9 @@ namespace SolutionMerger.Parsers
 {
     public class ProjectRelationInfo
     {
+        private readonly ProjectDirectory dir;
+
+        private readonly BaseProject project;
         //TODO: parse nested projects
         /*
         private static readonly Regex ReNestSection = new Regex(@"(?<ProjGuid>\{\S*?\})\s=\s(?<DirGuid>\{\S*?\})", RegexOptions.Multiline | RegexOptions.Compiled);
@@ -25,8 +28,5 @@ namespace SolutionMerger.Parsers
         {
             return string.Format("\t\t{0} = {1}{2}", project.Guid, dir.Guid, Environment.NewLine);
         }
-
-        private readonly BaseProject project;
-        private readonly ProjectDirectory dir;
     }
 }

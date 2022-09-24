@@ -9,14 +9,15 @@ namespace SolutionMerger.Models
 {
     public class Project : BaseProject
     {
-        public override string Location { get { return AbsolutePath; } }
-
         public string AbsolutePath { get; set; }
+        public override string Location => AbsolutePath;
 
         public static void GenerateProjectDirs(NestedProjectsInfo nestedSection, List<BaseProject> projects)
         {
             Func<BaseProject, string> getActualSolutionName = p =>
-                p is ProjectDirectory || p.Location.IsWebSiteUrl() || p.Location.StartsWith(p.SolutionDir)//Means it is a project that is located inside solution base folder or a project directory or its a website
+                p is ProjectDirectory || p.Location.IsWebSiteUrl() ||
+                p.Location.StartsWith(p
+                    .SolutionDir) //Means it is a project that is located inside solution base folder or a project directory or its a website
                     ? p.SolutionName
                     : PathHelpers.GetDirName(Path.GetDirectoryName(Path.GetDirectoryName(p.Location)));
 

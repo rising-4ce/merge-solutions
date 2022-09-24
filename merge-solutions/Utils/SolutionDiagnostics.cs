@@ -10,22 +10,16 @@ namespace SolutionMerger.Utils
 {
     public static class SolutionDiagnostics
     {
-        public static IGrouping<string, BaseProject>[] GetProjectGuidDuplicates(IEnumerable<SolutionInfo> solutions)
-        {
-            return solutions.SelectMany(s => s.Projects)
-                .Distinct(BaseProject.ProjectGuidLocationComparer)
-                .GroupBy(p => p.Guid)
-                .Where(gr => gr.Count() > 1)
-                .ToArray();
-        }
-
         public static string DiagnoseDupeGuids(IEnumerable<SolutionInfo> solutions)
         {
             var weirdProjects = GetProjectGuidDuplicates(solutions);
             if (weirdProjects.Length == 0)
+            {
                 return "";
+            }
 
-            var report = ReportWeirdProjects(new StringBuilder("Following projects have duplicate GUIDs:"), weirdProjects, p => p.SolutionName);
+            var report = ReportWeirdProjects(new StringBuilder("Following projects have duplicate GUIDs:"), weirdProjects,
+                p => p.SolutionName);
             report.AppendLine();
             report.AppendLine("Projects above have duplicate GUIDs");
             report.AppendLine();
@@ -41,15 +35,29 @@ namespace SolutionMerger.Utils
                 .ToArray();
 
             if (hopelessProjects.Length == 0)
+            {
                 return "";
+            }
 
-            var report = ReportWeirdProjects(new StringBuilder("Following projects with identical GUIDs are located in the same solution:"), hopelessProjects, p => p.Guid);
+            var report = ReportWeirdProjects(
+                new StringBuilder("Following projects with identical GUIDs are located in the same solution:"), hopelessProjects,
+                p => p.Guid);
             report.AppendLine("Its a pity, but in this case there is no way to help you");
             report.AppendLine("Good luck figuring it out...");
             return report.ToString();
         }
 
-        private static StringBuilder ReportWeirdProjects<T>(StringBuilder sb, IEnumerable<IGrouping<T, BaseProject>> weirdProjects, Func<BaseProject, string> itemDescriptor)
+        public static IGrouping<string, BaseProject>[] GetProjectGuidDuplicates(IEnumerable<SolutionInfo> solutions)
+        {
+            return solutions.SelectMany(s => s.Projects)
+                .Distinct(BaseProject.ProjectGuidLocationComparer)
+                .GroupBy(p => p.Guid)
+                .Where(gr => gr.Count() > 1)
+                .ToArray();
+        }
+
+        private static StringBuilder ReportWeirdProjects<T>(StringBuilder sb,
+            IEnumerable<IGrouping<T, BaseProject>> weirdProjects, Func<BaseProject, string> itemDescriptor)
         {
             sb.AppendLine();
             foreach (var weirdProjectGroup in weirdProjects)
@@ -63,6 +71,7 @@ namespace SolutionMerger.Utils
                     sb.AppendLine();
                 }
             }
+
             sb.AppendLine("---------------");
             return sb;
         }
