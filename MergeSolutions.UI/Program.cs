@@ -11,7 +11,7 @@ namespace MergeSolutions.UI
         ///  The main entry point for the application.
         /// </summary>
         [STAThread]
-        private static void Main()
+        private static void Main(string[] args)
         {
             // To customize application configuration such as set high DPI settings or default font,
             // see https://aka.ms/applicationconfiguration.
@@ -21,6 +21,7 @@ namespace MergeSolutions.UI
             services.AddTransient<MainForm>();
             services.AddSingleton<IMergeSolutionsService, MergeSolutionService>();
             services.AddSingleton<ISolutionService, SolutionService>();
+            services.AddTransient<IStartup>(_ => new Startup(args?.ElementAtOrDefault(0)));
             ServiceProvider = services.BuildServiceProvider();
 
             Application.Run(ServiceProvider.GetRequiredService<MainForm>());

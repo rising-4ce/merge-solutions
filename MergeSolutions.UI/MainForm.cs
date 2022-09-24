@@ -22,11 +22,15 @@ namespace MergeSolutions.UI
 
         private MergePlan _mergePlan = new MergePlan();
 
-        public MainForm(IMergeSolutionsService mergeSolutionsService, ISolutionService solutionService)
+        public MainForm(IMergeSolutionsService mergeSolutionsService, ISolutionService solutionService, IStartup startup)
         {
             _mergeSolutionsService = mergeSolutionsService;
             _solutionService = solutionService;
             InitializeComponent();
+            if (startup.PlanPath != null)
+            {
+                LoadMergePlan(startup.PlanPath);
+            }
         }
 
         private void buttonAppendSolution_Click(object sender, EventArgs e)
@@ -79,14 +83,8 @@ namespace MergeSolutions.UI
 
             if (openFileDialog.ShowDialog() == DialogResult.OK)
             {
-                var stream = openFileDialog.OpenFile();
-                using (stream)
-                {
-                    var mergePlan = JsonSerializer.Deserialize<MergePlan>(stream) ?? new MergePlan();
-                    mergePlan.PlanName = Path.GetFileNameWithoutExtension(openFileDialog.SafeFileName);
-                    _mergePlan = mergePlan;
-                    PlanToUi();
-                }
+                var fileName = openFileDialog.FileName;
+                LoadMergePlan(fileName);
             }
         }
 
@@ -134,6 +132,15 @@ namespace MergeSolutions.UI
         private void exitToolStripMenuItem_Click(object sender, EventArgs e)
         {
             Close();
+        }
+
+        private void LoadMergePlan(string fileName)
+        {
+            var content = File.ReadAllText(fileName);
+            var mergePlan = JsonSerializer.Deserialize<MergePlan>(content) ?? new MergePlan();
+            mergePlan.PlanName = Path.GetFileNameWithoutExtension(fileName);
+            _mergePlan = mergePlan;
+            PlanToUi();
         }
 
         private void MainForm_Load(object sender, EventArgs e)
