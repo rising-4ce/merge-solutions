@@ -26,9 +26,13 @@ namespace MergeSolutions.Core.Parsers
         public string? Text { get; private init; }
 
         public static SolutionInfo MergeSolutions(string newName, string baseDir, out string warnings,
-            params SolutionInfo[] solutions)
+            Func<BaseProject, bool>? projectFilter, params SolutionInfo[] solutions)
         {
-            var allProjects = solutions.SelectMany(s => s.Projects).Distinct(BaseProject.ProjectGuidLocationComparer).ToList();
+            var allProjects = solutions
+                .SelectMany(s => s.Projects)
+                .Where(projectFilter ?? (_ => true))
+                .Distinct(BaseProject.ProjectGuidLocationComparer)
+                .ToList();
 
             warnings = SolutionDiagnostics.DiagnoseDupeGuids(solutions);
 

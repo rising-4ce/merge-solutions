@@ -1,4 +1,5 @@
 ﻿using FluentAssertions;
+using MergeSolutions.Core.Models;
 using MergeSolutions.Core.Parsers;
 using Xunit;
 
@@ -20,7 +21,8 @@ namespace MergeSolutions.Tests
 
             var mergedSolution = SolutionInfo.MergeSolutions(Path.GetFileNameWithoutExtension(outputSolutionPath),
                 Path.GetDirectoryName(outputSolutionPath) ?? "",
-                out var warnings,
+                out _,
+                null,
                 solutionPaths.Select(SolutionInfo.Parse).ToArray());
             mergedSolution.Save();
 
@@ -58,7 +60,8 @@ namespace MergeSolutions.Tests
             var outputSolutionPath = Path.Combine(outDir, outSolutionName);
             var mergedSolution = SolutionInfo.MergeSolutions(Path.GetFileNameWithoutExtension(outputSolutionPath),
                 Path.GetDirectoryName(outputSolutionPath) ?? "",
-                out var warnings,
+                out _,
+                null,
                 solutionPaths.Select(SolutionInfo.Parse).ToArray());
             mergedSolution.Save();
 
@@ -98,6 +101,61 @@ namespace MergeSolutions.Tests
                 .Contain(p => p.Project.Guid == "{177D7443-2536-4B05-8CBD-5FAD3CE75FD3}");
             solutionInfo.NestedSection.Dirs[0].NestedProjects.Should()
                 .Contain(p => p.Project.Guid == "{2DA8C987-D5E9-4756-930E-1EBE4AC8D0AD}");
+        }
+
+        [Fact]
+        public void ProjectFilter()
+        {
+            var outDir = Path.Combine(Path.GetTempPath(), nameof(MergeSolutionsTests));
+            RecursiveDelete(new DirectoryInfo(outDir));
+            Directory.CreateDirectory(outDir);
+            var outSolutionName = "out.sln";
+
+            var solutionPaths = new[] {"TestData/SolutionA/SolutionA.sln", "TestData/SolutionB/SolutionB.sln"};
+
+            var outputSolutionPath = Path.Combine(outDir, outSolutionName);
+
+            var mergedSolution = SolutionInfo.MergeSolutions(Path.GetFileNameWithoutExtension(outputSolutionPath),
+                Path.GetDirectoryName(outputSolutionPath) ?? "",
+                out _,
+                project =>
+                {
+                    if (project.Name == "InSolutionFolderClassLibraryB")
+                    {
+                        return false;
+                    }
+
+                    return true;
+                },
+                solutionPaths.Select(SolutionInfo.Parse).ToArray());
+            mergedSolution.Save();
+
+            var solutionInfo = SolutionInfo.Parse(outputSolutionPath);
+
+            solutionInfo.Projects.Should().HaveCount(8);
+            solutionInfo.Projects.Should().NotContain(p => p.Name == "InSolutionFolderClassLibraryB");
+            solutionInfo.Projects.Should().Contain(p => p.Name == "InDiskFolderClassLibrary");
+
+            mergedSolution = SolutionInfo.MergeSolutions(Path.GetFileNameWithoutExtension(outputSolutionPath),
+                Path.GetDirectoryName(outputSolutionPath) ?? "",
+                out _,
+                project =>
+                {
+                    if (project.SolutionName == "SolutionA" && project.Name == "InDiskFolderClassLibrary")
+                    {
+                        return false;
+                    }
+
+                    return true;
+                },
+                solutionPaths.Select(SolutionInfo.Parse).ToArray());
+            mergedSolution.Save();
+
+            solutionInfo = SolutionInfo.Parse(outputSolutionPath);
+
+            solutionInfo.Projects.Should().HaveCount(8);
+            solutionInfo.Projects.Should().Contain(p => p.Name == "InSolutionFolderClassLibraryB");
+            solutionInfo.Projects.Should().NotContain(p => p.Name == "InDiskFolderClassLibrary");
         }
 
         private void RecursiveDelete(DirectoryInfo baseDir)

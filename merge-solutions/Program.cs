@@ -76,7 +76,8 @@ namespace SolutionMerger
 
             outputSlnPath = Path.GetFullPath(outputSlnPath);
             var aggregateSolution = SolutionInfo.MergeSolutions(Path.GetFileNameWithoutExtension(outputSlnPath),
-                Path.GetDirectoryName(outputSlnPath) ?? "", out var warnings, solutionNames.Select(SolutionInfo.Parse).ToArray());
+                Path.GetDirectoryName(outputSlnPath) ?? "", out var warnings, null,
+                solutionNames.Select(SolutionInfo.Parse).ToArray());
             aggregateSolution.Save();
 
             Console.WriteLine("Merged solution: {0}", outputSlnPath);
