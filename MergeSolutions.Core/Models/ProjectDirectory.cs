@@ -1,6 +1,6 @@
-﻿using SolutionMerger.Parsers;
+﻿using MergeSolutions.Core.Parsers;
 
-namespace SolutionMerger.Models
+namespace MergeSolutions.Core.Models
 {
     public class ProjectDirectory : BaseProject
     {

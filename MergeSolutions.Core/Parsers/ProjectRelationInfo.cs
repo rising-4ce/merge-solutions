@@ -1,6 +1,6 @@
-﻿using SolutionMerger.Models;
+﻿using MergeSolutions.Core.Models;
 
-namespace SolutionMerger.Parsers
+namespace MergeSolutions.Core.Parsers
 {
     public class ProjectRelationInfo
     {

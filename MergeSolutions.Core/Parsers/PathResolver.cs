@@ -1,7 +1,7 @@
 ﻿using System.Text.RegularExpressions;
-using SolutionMerger.Utils;
+using MergeSolutions.Core.Utils;
 
-namespace SolutionMerger.Parsers
+namespace MergeSolutions.Core.Parsers
 {
     public class PathResolver
     {

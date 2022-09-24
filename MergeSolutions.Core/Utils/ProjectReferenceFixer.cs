@@ -1,8 +1,8 @@
 ﻿using System.Text;
-using SolutionMerger.Models;
-using SolutionMerger.Parsers;
+using MergeSolutions.Core.Models;
+using MergeSolutions.Core.Parsers;
 
-namespace SolutionMerger.Utils
+namespace MergeSolutions.Core.Utils
 {
     public static class ProjectReferenceFixer
     {

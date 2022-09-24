@@ -1,8 +1,8 @@
 ﻿using System.Text.RegularExpressions;
-using SolutionMerger.Models;
-using SolutionMerger.Utils;
+using MergeSolutions.Core.Models;
+using MergeSolutions.Core.Utils;
 
-namespace SolutionMerger.Parsers
+namespace MergeSolutions.Core.Parsers
 {
     public class ProjectInfo
     {

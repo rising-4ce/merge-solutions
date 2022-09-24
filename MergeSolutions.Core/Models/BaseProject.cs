@@ -1,7 +1,7 @@
-using SolutionMerger.Parsers;
-using SolutionMerger.Utils;
+using MergeSolutions.Core.Parsers;
+using MergeSolutions.Core.Utils;
 
-namespace SolutionMerger.Models
+namespace MergeSolutions.Core.Models
 {
     public abstract class BaseProject
     {

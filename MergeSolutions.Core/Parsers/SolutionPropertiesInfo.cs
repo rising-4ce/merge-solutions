@@ -1,6 +1,6 @@
 ﻿using System.Text.RegularExpressions;
 
-namespace SolutionMerger.Parsers
+namespace MergeSolutions.Core.Parsers
 {
     public class SolutionPropertiesInfo
     {

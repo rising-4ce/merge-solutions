@@ -1,4 +1,4 @@
-﻿namespace SolutionMerger.Utils
+﻿namespace MergeSolutions.Core.Utils
 {
     public static class PathHelpers
     {
