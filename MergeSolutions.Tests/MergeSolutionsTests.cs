@@ -1,5 +1,4 @@
 ﻿using FluentAssertions;
-using MergeSolutions.Core.Models;
 using MergeSolutions.Core.Parsers;
 using Xunit;
 
