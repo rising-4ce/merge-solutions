@@ -1,4 +1,3 @@
-using System.Collections.Generic;
 using SolutionMerger.Parsers;
 using SolutionMerger.Utils;
 

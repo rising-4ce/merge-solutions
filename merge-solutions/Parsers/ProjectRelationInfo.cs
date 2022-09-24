@@ -1,5 +1,4 @@
-﻿using System;
-using SolutionMerger.Models;
+﻿using SolutionMerger.Models;
 
 namespace SolutionMerger.Parsers
 {

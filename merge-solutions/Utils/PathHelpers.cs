@@ -1,7 +1,4 @@
-﻿using System;
-using System.IO;
-
-namespace SolutionMerger.Utils
+﻿namespace SolutionMerger.Utils
 {
     public static class PathHelpers
     {

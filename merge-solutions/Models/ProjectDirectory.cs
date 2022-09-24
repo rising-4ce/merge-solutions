@@ -1,6 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using SolutionMerger.Parsers;
+﻿using SolutionMerger.Parsers;
 
 namespace SolutionMerger.Models
 {

@@ -1,7 +1,4 @@
-﻿using System.Collections.Generic;
-using System.IO;
-using System.Linq;
-using SolutionMerger.Models;
+﻿using SolutionMerger.Models;
 using SolutionMerger.Utils;
 
 namespace SolutionMerger.Parsers
