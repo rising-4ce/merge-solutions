@@ -68,23 +68,7 @@ namespace MergeSolutions.UI
             }
         }
 
-        private void exitToolStripMenuItem_Click(object sender, EventArgs e)
-        {
-            Close();
-        }
-
-        private void MainForm_Load(object sender, EventArgs e)
-        {
-            PlanToUi();
-        }
-
-        private void newMergePlanToolStripMenuItem1_Click(object sender, EventArgs e)
-        {
-            _mergePlan = new MergePlan();
-            PlanToUi();
-        }
-
-        private void openMergePlanToolStripMenuItem_Click(object sender, EventArgs e)
+        private void buttonOpenPlan_Click(object sender, EventArgs e)
         {
             using var openFileDialog = new OpenFileDialog
             {
@@ -104,6 +88,57 @@ namespace MergeSolutions.UI
                     PlanToUi();
                 }
             }
+        }
+
+        private void buttonReset_Click(object sender, EventArgs e)
+        {
+            _mergePlan = new MergePlan();
+            PlanToUi();
+        }
+
+        private void buttonRunMerge_Click(object sender, EventArgs e)
+        {
+            UiToPlan();
+            _mergeSolutionsService.MergeSolutions(_mergePlan);
+            PlanToUi();
+            MessageBox.Show("Done");
+        }
+
+        private void buttonSaveMergePlan_Click(object sender, EventArgs e)
+        {
+            UiToPlan();
+            using var saveFileDialog = new SaveFileDialog
+            {
+                Filter = MergeSolutionsPlanFilter,
+                FilterIndex = 1,
+                FileName = _mergePlan.PlanName,
+                RestoreDirectory = true
+            };
+
+            if (saveFileDialog.ShowDialog() == DialogResult.OK)
+            {
+                var stream = saveFileDialog.OpenFile();
+                using (stream)
+                {
+                    JsonSerializer.Serialize(stream, _mergePlan, new JsonSerializerOptions
+                    {
+                        WriteIndented = true
+                    });
+                    _mergePlan.PlanName = Path.GetFileNameWithoutExtension(saveFileDialog.FileName);
+                }
+
+                PlanToUi();
+            }
+        }
+
+        private void exitToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            Close();
+        }
+
+        private void MainForm_Load(object sender, EventArgs e)
+        {
+            PlanToUi();
         }
 
         private void PlanToUi()
@@ -133,41 +168,6 @@ namespace MergeSolutions.UI
 
                 treeViewSolutions.Nodes.Add(solutionNode);
                 solutionNode.Expand();
-            }
-        }
-
-        private void runMergeToolStripMenuItem_Click(object sender, EventArgs e)
-        {
-            UiToPlan();
-            _mergeSolutionsService.MergeSolutions(_mergePlan);
-            PlanToUi();
-            MessageBox.Show("Done");
-        }
-
-        private void saveMergePlanToolStripMenuItem_Click(object sender, EventArgs e)
-        {
-            UiToPlan();
-            using var saveFileDialog = new SaveFileDialog
-            {
-                Filter = MergeSolutionsPlanFilter,
-                FilterIndex = 1,
-                FileName = _mergePlan.PlanName,
-                RestoreDirectory = true
-            };
-
-            if (saveFileDialog.ShowDialog() == DialogResult.OK)
-            {
-                var stream = saveFileDialog.OpenFile();
-                using (stream)
-                {
-                    JsonSerializer.Serialize(stream, _mergePlan, new JsonSerializerOptions
-                    {
-                        WriteIndented = true
-                    });
-                    _mergePlan.PlanName = Path.GetFileNameWithoutExtension(saveFileDialog.FileName);
-                }
-
-                PlanToUi();
             }
         }
 
