@@ -6,63 +6,74 @@ namespace SolutionMerger.Parsers
 {
     public class ProjectInfo
     {
-        private static readonly Regex ReSolutionItemPath =
+        private static readonly Regex _reSolutionItemPath =
             new Regex(
                 @"ProjectSection\(SolutionItems\)\s=\spreProject(\s*(?<" + PathResolver.LocationGroupName + @">.*?)\s=\s(?<" +
                 PathResolver.LocationGroupName + @">.*?))*\s*EndProjectSection", RegexOptions.Multiline | RegexOptions.Compiled);
 
-        private static readonly Regex ReWebsitePath =
+        private static readonly Regex _reWebsitePath =
             new Regex(@"AspNetCompiler\.PhysicalPath\s=\s""(?<Path>.*?)""|SlnRelativePath\s=\s""(?<Path>.*?)""",
                 RegexOptions.Multiline | RegexOptions.Compiled);
 
-        private static readonly Regex ReProjects =
+        private static readonly Regex _reProjects =
             new Regex(
-                @"Project\(\""(?<Package>\{.*?\})\"".*?\""(?<Name>.*?)\"".*?\""(?<Project>.*?)\"".*?\""(?<Guid>.*?)\""(?<All>[\s\S]*?)EndProject\s",
+                @"Project1\(\""(?<Package>\{.*?\})\"".*?\""(?<Name>.*?)\"".*?\""(?<Project1>.*?)\"".*?\""(?<Guid>.*?)\""(?<All>[\s\S]*?)EndProject\s",
                 RegexOptions.Multiline | RegexOptions.Compiled);
 
-        private readonly string all;
-        private readonly PathResolver pathResolver;
+        private readonly string _all;
 
-        public BaseProject Project;
+        private readonly PathResolver _pathResolver;
 
-        public ProjectInfo(SolutionInfo solutionInfo, string package, string all)
+        public ProjectInfo(SolutionInfo? solutionInfo, string package, string all)
         {
             SolutionInfo = solutionInfo;
             Package = package;
-            this.all = all;
+            _all = all;
 
-            pathResolver = new PathResolver(BaseDir);
+            _pathResolver = new PathResolver(BaseDir);
         }
 
         public string Package { get; }
-        public SolutionInfo SolutionInfo { get; set; }
+
+        public BaseProject? Project { get; set; }
+
+        public SolutionInfo? SolutionInfo { get; set; }
 
         private string BaseDir => SolutionInfo == null
             ? ""
             : SolutionInfo.BaseDir;
 
-        public static List<BaseProject> Parse(SolutionInfo solutionInfo)
+        public static List<BaseProject> Parse(SolutionInfo? solutionInfo)
         {
-            return ReProjects.Matches(solutionInfo.Text)
-                .Cast<Match>()
-                .Select(m => BaseProject.Create(m.Groups["Guid"].Value, m.Groups["Name"].Value, m.Groups["Project"].Value,
+            if (solutionInfo?.Text == null)
+            {
+                return new List<BaseProject>();
+            }
+
+            return _reProjects.Matches(solutionInfo.Text)
+                .Select(m => BaseProject.Create(m.Groups["Guid"].Value, m.Groups["Name"].Value, m.Groups["Project1"].Value,
                     new ProjectInfo(solutionInfo, m.Groups["Package"].Value, m.Groups["All"].Value)))
                 .ToList();
         }
 
         public override string ToString()
         {
+            if (Project == null)
+            {
+                return "<null>";
+            }
+
             var name = Project.Name;
             var guid = Project.Guid;
             var location = Project is ProjectDirectory
                 ? Project.Location
                 : PathHelpers.ResolveRelativePath(BaseDir, Project.Location);
 
-            var body = all;
-            body = pathResolver.Relocate(body, BaseDir, ReSolutionItemPath);
-            body = pathResolver.Relocate(body, BaseDir, ReWebsitePath);
+            var body = _all;
+            body = _pathResolver.Relocate(body, BaseDir, _reSolutionItemPath);
+            body = _pathResolver.Relocate(body, BaseDir, _reWebsitePath);
 
-            return string.Format(@"{5}Project(""{0}"") = ""{1}"", ""{2}"", ""{3}""{4}EndProject", Package, name, location, guid,
+            return string.Format(@"{5}Project1(""{0}"") = ""{1}"", ""{2}"", ""{3}""{4}EndProject", Package, name, location, guid,
                 body, Environment.NewLine);
         }
     }

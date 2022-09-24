@@ -15,7 +15,7 @@ namespace SolutionMerger.Utils
             }
 
             var report = ReportWeirdProjects(new StringBuilder("Following projects have duplicate GUIDs:"), weirdProjects,
-                p => p.SolutionName);
+                p => p.SolutionName ?? "<no solution name>");
             report.AppendLine();
             report.AppendLine("Projects above have duplicate GUIDs");
             report.AppendLine();
@@ -26,8 +26,8 @@ namespace SolutionMerger.Utils
         public static string DiagnoseDupeGuidsInTheSameSolution(IEnumerable<IGrouping<string, BaseProject>> weirdProjects)
         {
             var hopelessProjects = weirdProjects.SelectMany(g => g)
-                .GroupBy(p => Path.Combine(p.SolutionDir, p.SolutionName + ".sln"))
-                .Where(g => g.GroupBy(p => p.Guid).Where(gg => gg.Count() > 1).Count() > 1)
+                .GroupBy(p => Path.Combine(p.SolutionDir ?? "", p.SolutionName + ".sln"))
+                .Where(g => g.GroupBy(p => p.Guid).Count(gg => gg.Count() > 1) > 1)
                 .ToArray();
 
             if (hopelessProjects.Length == 0)

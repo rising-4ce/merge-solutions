@@ -9,11 +9,11 @@ namespace SolutionMerger.Parsers
 
         public static NestedProjectSection Parse(ProjectDirectory[] projects, string slnText)
         {
-            Project.ParseConfigs(ref projects, ReConfSection.Match(slnText).Groups["Section"].Value);
+            Project1.ParseConfigs(ref projects, ReConfSection.Match(slnText).Groups["Section"].Value);
             return new VsProjectConfiguration(projects);
         }*/
 
-        public NestedProjectsInfo(List<ProjectDirectory> dirs = null)
+        public NestedProjectsInfo(List<ProjectDirectory>? dirs = null)
         {
             Dirs = dirs ?? new List<ProjectDirectory>();
         }

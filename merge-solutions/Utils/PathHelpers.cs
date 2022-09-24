@@ -14,7 +14,7 @@
 
         public static bool IsWebSiteUrl(this string path)
         {
-            return path.Contains(@"://") || path.Contains(@":\\");
+            return path != null && (path.Contains(@"://") || path.Contains(@":\\"));
         }
 
         public static string ResolveAbsolutePath(string baseDir, string relativePath)
@@ -34,7 +34,7 @@
         private static string EvaluateRelativePath(string mainDirPath, string absoluteFilePath)
         {
             var firstPathParts = mainDirPath.Trim(Path.DirectorySeparatorChar).Split(Path.DirectorySeparatorChar);
-            var secondPathParts = absoluteFilePath.Trim(Path.DirectorySeparatorChar).Split(Path.DirectorySeparatorChar);
+            string[] secondPathParts = absoluteFilePath.Trim(Path.DirectorySeparatorChar).Split(Path.DirectorySeparatorChar);
 
             var sameCounter = 0;
             for (var i = 0; i < Math.Min(firstPathParts.Length, secondPathParts.Length); i++)
@@ -77,9 +77,9 @@
             return newPath;
         }
 
-        private static bool IsNonPath(this string path)
+        private static bool IsNonPath(this string? path)
         {
-            return !(path.Contains(":") || path.Contains(@"\") || path.Contains("/"));
+            return path != null && !(path.Contains(":") || path.Contains(@"\") || path.Contains("/"));
         }
     }
 }

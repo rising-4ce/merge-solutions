@@ -6,19 +6,18 @@ namespace SolutionMerger.Models
     {
         private const string DirPackageGuid = "{2150E333-8FDC-42A3-9474-1A3956D46DE8}";
 
-        public ProjectDirectory(string name, string guid = null, string packageGuid = null)
+        public ProjectDirectory(string name, string? guid = null, string? packageGuid = null)
+            : base(guid ?? "{" + System.Guid.NewGuid().ToString().ToUpper() + "}",
+                name,
+                new ProjectInfo(null, packageGuid ?? DirPackageGuid, Environment.NewLine))
         {
-            Guid = guid ?? "{" + System.Guid.NewGuid().ToString().ToUpper() + "}";
-            Name = name;
-            ProjectInfo = new ProjectInfo(null, packageGuid ?? DirPackageGuid, Environment.NewLine)
-            {
-                Project = this
-            };
             NestedProjects = new List<ProjectRelationInfo>();
         }
 
         public override string Location => Name;
+
         public List<ProjectRelationInfo> NestedProjects { get; }
-        public NestedProjectsInfo NestedProjectsInfo { get; set; }
+
+        public NestedProjectsInfo? NestedProjectsInfo { get; set; }
     }
 }

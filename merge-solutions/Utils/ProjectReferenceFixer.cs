@@ -6,7 +6,7 @@ namespace SolutionMerger.Utils
 {
     public static class ProjectReferenceFixer
     {
-        public static void FixAllSolutions(SolutionInfo[] allSolutions, out string errors)
+        public static void FixAllSolutions(SolutionInfo[] allSolutions, out string? errors)
         {
             var dupes = SolutionDiagnostics.GetProjectGuidDuplicates(allSolutions);
             if (dupes.Length == 0)
@@ -26,16 +26,18 @@ namespace SolutionMerger.Utils
                     .ToArray(); //it's sufficient to rename all but one dupe - it'll be left with uniquer GUID
 
             //Find all solutions with dupes
-            var slns = allSolutions
+            var solutions = allSolutions
                 .Where(s => s.Projects.Any(p => dupedProjects.Contains(p, BaseProject.ProjectGuidLocationComparer)))
-                .ToDictionary(s => s, s => s.Text);
+                .Where(s => s.Text != null)
+                .ToDictionary(s => s, s => s.Text!);
+
             //Find all projects of these solutions - check for read/write access??
-            var prjs = slns.Keys.SelectMany(s => s.Projects).OfType<Project>()
+            var projects = solutions.Keys.SelectMany(s => s.Projects).OfType<Project>()
                 .Distinct<Project>(BaseProject.ProjectGuidLocationComparer).Where(pp => File.Exists(pp.AbsolutePath))
                 .ToDictionary(pp => pp, pp => File.ReadAllText(pp.AbsolutePath));
 
             //checks for Read/Write access :) - overwrites potentially modified files without changes
-            errors = OverwriteFiles(slns, prjs);
+            errors = OverwriteFiles(solutions, projects);
 
             if (!string.IsNullOrEmpty(errors))
             {
@@ -48,11 +50,12 @@ namespace SolutionMerger.Utils
                 var brokenGuid = dupe.Guid.Substring(1, dupe.Guid.Length - 2);
                 var newGuid = Guid.NewGuid().ToString().ToUpper();
 
-                var affectedSolutions = slns.Keys.Where(s => s.Projects.Contains(dupe, BaseProject.ProjectGuidLocationComparer))
+                var affectedSolutions = solutions.Keys
+                    .Where(s => s.Projects.Contains(dupe, BaseProject.ProjectGuidLocationComparer))
                     .ToArray();
                 foreach (var s in affectedSolutions)
                 {
-                    slns[s] = slns[s].Replace(brokenGuid, newGuid);
+                    solutions[s] = solutions[s].Replace(brokenGuid, newGuid);
                 }
 
                 if (dupe is ProjectDirectory) // directories are mentioned only in solution files
@@ -60,25 +63,26 @@ namespace SolutionMerger.Utils
                     continue;
                 }
 
-                var affectedProjects = prjs.Keys.Where(p => affectedSolutions.Contains(p.ProjectInfo.SolutionInfo)).ToArray();
+                var affectedProjects = projects.Keys.Where(p => affectedSolutions.Contains(p.ProjectInfo.SolutionInfo)).ToArray();
                 foreach (var p in affectedProjects)
                 {
-                    prjs[p] = prjs[p].Replace(brokenGuid, newGuid);
+                    projects[p] = projects[p].Replace(brokenGuid, newGuid);
                 }
             }
 
-            errors = OverwriteFiles(slns, prjs);
+            errors = OverwriteFiles(solutions, projects);
         }
 
-        private static string OverwriteFiles(Dictionary<SolutionInfo, string> slns, Dictionary<Project, string> projectsToCleanup)
+        private static string OverwriteFiles(Dictionary<SolutionInfo, string> solutions,
+            Dictionary<Project, string> projectsToCleanup)
         {
             var errorLog = new StringBuilder();
-            foreach (var sln in slns.Keys)
+            foreach (var sln in solutions.Keys)
             {
                 var filename = Path.Combine(sln.BaseDir, sln.Name + ".sln");
                 try
                 {
-                    File.WriteAllText(filename, slns[sln]);
+                    File.WriteAllText(filename, solutions[sln]);
                 }
                 catch
                 {

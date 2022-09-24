@@ -6,16 +6,16 @@ namespace SolutionMerger.Parsers
     public class PathResolver
     {
         public const string LocationGroupName = "Path";
-        private readonly string originalBaseDir;
+        private readonly string _originalBaseDir;
 
         public PathResolver(string originalBaseDir)
         {
-            this.originalBaseDir = originalBaseDir;
+            _originalBaseDir = originalBaseDir;
         }
 
         public string Relocate(string source, string newBaseDir, Regex matcher)
         {
-            if (newBaseDir == originalBaseDir)
+            if (newBaseDir == _originalBaseDir)
             {
                 return source;
             }
@@ -45,7 +45,7 @@ namespace SolutionMerger.Parsers
                 }
 
                 var newPath = PathHelpers.ResolveRelativePath(newBaseDir,
-                    PathHelpers.ResolveAbsolutePath(originalBaseDir, capture.Value));
+                    PathHelpers.ResolveAbsolutePath(_originalBaseDir, capture.Value));
                 result = result.Substring(0, capture.Index) + newPath + result.Substring(capture.Index + capture.Length);
             }
 

@@ -14,11 +14,15 @@ namespace SolutionMerger.Parsers
         }
 
         public string BaseDir { get; }
+
         public string Name { get; }
 
-        public List<BaseProject> Projects { get; private set; }
-        public string Text { get; private set; }
+        public List<BaseProject> Projects { get; private set; } = new();
+
+        public string? Text { get; private set; }
+
         private NestedProjectsInfo NestedSection { get; }
+
         private SolutionPropertiesInfo PropsSection { get; }
 
         public static SolutionInfo MergeSolutions(string newName, string baseDir, out string warnings,
@@ -32,6 +36,7 @@ namespace SolutionMerger.Parsers
             {
                 Projects = allProjects
             };
+
             mergedSln.CreateNestedDirs()
                 .Projects.ForEach(pr => pr.ProjectInfo.SolutionInfo = mergedSln);
 
@@ -45,10 +50,11 @@ namespace SolutionMerger.Parsers
             var slnBaseDir = Path.GetDirectoryName(path);
             var props = SolutionPropertiesInfo.Parse(slnText);
 
-            var sln = new SolutionInfo(Path.GetFileNameWithoutExtension(path), slnBaseDir, props, new NestedProjectsInfo())
+            var sln = new SolutionInfo(Path.GetFileNameWithoutExtension(path), slnBaseDir!, props, new NestedProjectsInfo())
             {
                 Text = slnText
             };
+
             sln.Projects = ProjectInfo.Parse(sln);
 
             return sln;
@@ -61,14 +67,13 @@ namespace SolutionMerger.Parsers
 
         public override string ToString()
         {
-            return string.Format(
-                @"Microsoft Visual Studio Solution File, Format Version 11.00
-# Visual Studio 2010{0}
+            return $@"Microsoft Visual Studio Solution File, Format Version 11.00
+# Visual Studio 2010{string.Concat(Projects.Select(p => p.ProjectInfo))}
 Global
-{1}
-{2}
+{PropsSection}
+{NestedSection}
 EndGlobal
-", string.Concat(Projects.Select(p => p.ProjectInfo)), PropsSection, NestedSection);
+";
         }
 
         private SolutionInfo CreateNestedDirs()
