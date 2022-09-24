@@ -5,11 +5,11 @@ namespace MergeSolutions.Core.Parsers
 {
     public class NestedProjectsInfo
     {
-        private static readonly Regex _reNestSection =
+        private static readonly Regex _reNestedProjectsSection =
             new Regex(@"GlobalSection\(NestedProjects\)\s=\spreSolution(?<Section>[\s\S]*?)EndGlobalSection",
                 RegexOptions.Multiline | RegexOptions.Compiled);
 
-        private static readonly Regex _reNestLine =
+        private static readonly Regex _reNestedProjectsLine =
             new Regex(@"(?<Guid1>\{[\dABCDEFabcdef-]*\}).*=.*(?<Guid2>\{[\dABCDEFabcdef-]*\})",
                 RegexOptions.Multiline | RegexOptions.Compiled);
 
@@ -23,11 +23,11 @@ namespace MergeSolutions.Core.Parsers
         public static NestedProjectsInfo Parse(ICollection<BaseProject> projects, string slnText)
         {
             var nestedProjectsInfo = new NestedProjectsInfo();
-            var matchCollection1 = _reNestSection.Matches(slnText);
+            var matchCollection1 = _reNestedProjectsSection.Matches(slnText);
             if (matchCollection1.Count == 1)
             {
                 var section = matchCollection1[0].Groups["Section"];
-                var matchCollection2 = _reNestLine.Matches(section.Value);
+                var matchCollection2 = _reNestedProjectsLine.Matches(section.Value);
                 foreach (Match match in matchCollection2)
                 {
                     var guid1 = match.Groups["Guid1"].Value;
@@ -55,8 +55,8 @@ namespace MergeSolutions.Core.Parsers
 
         public override string ToString()
         {
-            return string.Format("\tGlobalSection(NestedProjects) = preSolution{1}{0}\tEndGlobalSection",
-                string.Concat(Dirs.SelectMany(p => p.NestedProjects)), Environment.NewLine);
+            var lines = string.Concat(Dirs.SelectMany(p => p.NestedProjects));
+            return $"\tGlobalSection(NestedProjects) = preSolution{Environment.NewLine}{lines}\tEndGlobalSection";
         }
     }
 }

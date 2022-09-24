@@ -103,6 +103,17 @@ namespace MergeSolutions.Tests
         }
 
         [Fact]
+        public void PlatformsParsing()
+        {
+            var solutionInfo = SolutionInfo.Parse("TestData/SolutionA/SolutionA.sln");
+            solutionInfo.PlatformsSection.Lines.Should().HaveCount(2);
+            solutionInfo.PlatformsSection.Lines.Should()
+                .Contain(p => p.Key == "Debug|Any CPU" && p.Value == "Debug|Any CPU");
+            solutionInfo.PlatformsSection.Lines.Should()
+                .Contain(p => p.Key == "Release|Any CPU" && p.Value == "Release|Any CPU");
+        }
+
+        [Fact]
         public void ProjectFilter()
         {
             var outDir = Path.Combine(Path.GetTempPath(), nameof(MergeSolutionsTests));

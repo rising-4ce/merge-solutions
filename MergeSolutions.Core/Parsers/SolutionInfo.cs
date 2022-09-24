@@ -11,6 +11,7 @@ namespace MergeSolutions.Core.Parsers
             BaseDir = Path.GetFullPath(baseDir);
             PropsSection = propsSection;
             NestedSection = new NestedProjectsInfo();
+            PlatformsSection = new SolutionConfigurationPlatformsInfo();
         }
 
         public string BaseDir { get; }
@@ -18,6 +19,8 @@ namespace MergeSolutions.Core.Parsers
         public string Name { get; }
 
         public NestedProjectsInfo NestedSection { get; private set; }
+
+        public SolutionConfigurationPlatformsInfo PlatformsSection { get; private set; }
 
         public List<BaseProject> Projects { get; private set; } = new();
 
@@ -60,8 +63,8 @@ namespace MergeSolutions.Core.Parsers
             };
 
             sln.Projects = ProjectInfo.Parse(sln);
-
             sln.NestedSection = NestedProjectsInfo.Parse(sln.Projects, slnText);
+            sln.PlatformsSection = SolutionConfigurationPlatformsInfo.Parse(slnText);
 
             return sln;
         }
@@ -81,6 +84,7 @@ VisualStudioVersion = 17.3.32901.215
 MinimumVisualStudioVersion = 10.0.40219.1
 {projectsSection}
 Global
+{PlatformsSection}
 {PropsSection}
 {NestedSection}
 EndGlobal
