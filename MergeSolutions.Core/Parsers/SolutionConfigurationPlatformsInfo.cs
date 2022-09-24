@@ -12,9 +12,9 @@ namespace MergeSolutions.Core.Parsers
             new Regex(@"\s*(?<Left>[^=]*)\s+?=\s+?(?<Right>[^\n\r]*)",
                 RegexOptions.Multiline | RegexOptions.Compiled);
 
-        public SolutionConfigurationPlatformsInfo(List<KeyValuePair<string, string>>? lines = null)
+        public SolutionConfigurationPlatformsInfo(IEnumerable<KeyValuePair<string, string>>? lines = null)
         {
-            Lines = lines ?? new List<KeyValuePair<string, string>>();
+            Lines = lines?.ToList() ?? new List<KeyValuePair<string, string>>();
         }
 
         public List<KeyValuePair<string, string>> Lines { get; }

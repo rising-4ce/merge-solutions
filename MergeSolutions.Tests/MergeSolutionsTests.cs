@@ -43,6 +43,12 @@ namespace MergeSolutions.Tests
                 .Contain(p => p.Project.Guid == "{8FE39D73-9DBF-47A0-94E3-24F96625B4EA}");
             solutionNamedSubDir.NestedProjects.Should()
                 .Contain(p => p.Project.Guid == "{23030AF7-941A-498B-805B-2EF13D6982E7}");
+
+            solutionInfo.PlatformsSection.Lines.Should().HaveCount(2);
+            solutionInfo.PlatformsSection.Lines.Should()
+                .Contain(p => p.Key == "Debug|Any CPU" && p.Value == "Debug|Any CPU");
+            solutionInfo.PlatformsSection.Lines.Should()
+                .Contain(p => p.Key == "Release|Any CPU" && p.Value == "Release|Any CPU");
         }
 
         [Fact]
@@ -87,6 +93,12 @@ namespace MergeSolutions.Tests
                 .Contain(p => p.Project.Guid == "{8C9DBCF6-C2A9-4D55-BD48-AADF40240336}");
             solutionBNamedSubDir.NestedProjects.Should()
                 .Contain(p => p.Project.Guid == "{EADACA47-6660-4693-A6A8-6ACFF1CF6A46}");
+
+            solutionInfo.PlatformsSection.Lines.Should().HaveCount(2);
+            solutionInfo.PlatformsSection.Lines.Should()
+                .Contain(p => p.Key == "Debug|Any CPU" && p.Value == "Debug|Any CPU");
+            solutionInfo.PlatformsSection.Lines.Should()
+                .Contain(p => p.Key == "Release|Any CPU" && p.Value == "Release|Any CPU");
         }
 
         [Fact]

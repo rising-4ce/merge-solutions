@@ -44,6 +44,10 @@ namespace MergeSolutions.Core.Parsers
                 Projects = allProjects
             };
 
+            var platformLines = allProjects.Where(p => p.ProjectInfo.SolutionInfo != null)
+                .SelectMany(p => p.ProjectInfo.SolutionInfo!.PlatformsSection.Lines).Distinct().ToArray();
+            mergedSln.PlatformsSection = new SolutionConfigurationPlatformsInfo(platformLines);
+
             mergedSln.CreateNestedDirs()
                 .Projects.ForEach(pr => pr.ProjectInfo.SolutionInfo = mergedSln);
 
