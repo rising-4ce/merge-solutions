@@ -1,6 +1,7 @@
 using System.Runtime.CompilerServices;
 using MergeSolutions.Core.Services;
 using Microsoft.Extensions.DependencyInjection;
+
 // ReSharper disable LocalizableElement
 
 namespace MergeSolutions.UI

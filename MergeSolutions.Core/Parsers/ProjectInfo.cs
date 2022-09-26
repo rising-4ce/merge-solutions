@@ -19,18 +19,18 @@ namespace MergeSolutions.Core.Parsers
                 @"Project\(\""(?<Package>\{.*?\})\"".*?\""(?<Name>.*?)\"".*?\""(?<Project1>.*?)\"".*?\""(?<Guid>.*?)\""(?<All>[\s\S]*?)EndProject\s",
                 RegexOptions.Multiline | RegexOptions.Compiled);
 
-        private readonly string _all;
-
         private readonly PathResolver _pathResolver;
 
         public ProjectInfo(SolutionInfo? solutionInfo, string package, string all)
         {
             SolutionInfo = solutionInfo;
             Package = package;
-            _all = all;
+            All = all;
 
             _pathResolver = new PathResolver(BaseDir);
         }
+
+        public string All { get; }
 
         public string Package { get; }
 
@@ -68,7 +68,7 @@ namespace MergeSolutions.Core.Parsers
                 ? Project.Location
                 : PathHelpers.ResolveRelativePath(BaseDir, Project.Location);
 
-            var body = _all;
+            var body = All;
             body = _pathResolver.Relocate(body, BaseDir, _reSolutionItemPath);
             body = _pathResolver.Relocate(body, BaseDir, _reWebsitePath);
 
