@@ -18,6 +18,7 @@ namespace MergeSolutions.UI
         public const string AppName = "Merge Solutions UI";
 
         private readonly IMergeSolutionsService _mergeSolutionsService;
+
         private readonly ISolutionService _solutionService;
 
         private MergePlan _mergePlan = new MergePlan();
@@ -35,97 +36,127 @@ namespace MergeSolutions.UI
 
         private void buttonAppendSolution_Click(object sender, EventArgs e)
         {
-            using var openFileDialog = new OpenFileDialog
+            InTryCatch(() =>
             {
-                Filter = SolutionFilter,
-                FilterIndex = 1,
-                RestoreDirectory = true
-            };
-
-            if (openFileDialog.ShowDialog() == DialogResult.OK)
-            {
-                var stream = openFileDialog.OpenFile();
-                using (stream)
+                using var openFileDialog = new OpenFileDialog
                 {
-                    var solutionName = Path.GetFileNameWithoutExtension(openFileDialog.SafeFileName);
-                    _mergePlan.Solutions[solutionName] = openFileDialog.FileName;
-                    PlanToUi();
+                    Filter = SolutionFilter,
+                    FilterIndex = 1,
+                    RestoreDirectory = true
+                };
+
+                if (openFileDialog.ShowDialog() == DialogResult.OK)
+                {
+                    var stream = openFileDialog.OpenFile();
+                    using (stream)
+                    {
+                        var solutionName = Path.GetFileNameWithoutExtension(openFileDialog.SafeFileName);
+                        _mergePlan.Solutions[solutionName] = openFileDialog.FileName;
+                        PlanToUi();
+                    }
                 }
-            }
+            });
         }
 
         private void buttonBrowseOutputSolutionPath_Click(object sender, EventArgs e)
         {
-            UiToPlan();
-            using var saveFileDialog = new SaveFileDialog
+            InTryCatch(() =>
             {
-                Filter = SolutionFilter,
-                FilterIndex = 1,
-                FileName = _mergePlan.PlanName,
-                RestoreDirectory = true
-            };
+                UiToPlan();
+                using var saveFileDialog = new SaveFileDialog
+                {
+                    Filter = SolutionFilter,
+                    FilterIndex = 1,
+                    FileName = _mergePlan.PlanName,
+                    RestoreDirectory = true
+                };
 
-            if (saveFileDialog.ShowDialog() == DialogResult.OK)
-            {
-                _mergePlan.OutputSolutionPath = saveFileDialog.FileName;
-                PlanToUi();
-            }
+                if (saveFileDialog.ShowDialog() == DialogResult.OK)
+                {
+                    _mergePlan.OutputSolutionPath = saveFileDialog.FileName;
+                    PlanToUi();
+                }
+            });
         }
 
         private void buttonOpenPlan_Click(object sender, EventArgs e)
         {
-            using var openFileDialog = new OpenFileDialog
+            InTryCatch(() =>
             {
-                Filter = MergeSolutionsPlanFilter,
-                FilterIndex = 1,
-                RestoreDirectory = true
-            };
+                using var openFileDialog = new OpenFileDialog
+                {
+                    Filter = MergeSolutionsPlanFilter,
+                    FilterIndex = 1,
+                    RestoreDirectory = true
+                };
 
-            if (openFileDialog.ShowDialog() == DialogResult.OK)
-            {
-                var fileName = openFileDialog.FileName;
-                LoadMergePlan(fileName);
-            }
+                if (openFileDialog.ShowDialog() == DialogResult.OK)
+                {
+                    var fileName = openFileDialog.FileName;
+                    LoadMergePlan(fileName);
+                }
+            });
         }
 
         private void buttonReset_Click(object sender, EventArgs e)
         {
-            _mergePlan = new MergePlan();
-            PlanToUi();
+            InTryCatch(() =>
+            {
+                _mergePlan = new MergePlan();
+                PlanToUi();
+            });
         }
 
         private void buttonRunMerge_Click(object sender, EventArgs e)
         {
-            UiToPlan();
-            _mergeSolutionsService.MergeSolutions(_mergePlan);
-            PlanToUi();
-            MessageBox.Show("Done");
+            InTryCatch(() =>
+            {
+                UiToPlan();
+                _mergeSolutionsService.MergeSolutions(_mergePlan);
+                PlanToUi();
+                MessageBox.Show("Done");
+            });
         }
 
         private void buttonSaveMergePlan_Click(object sender, EventArgs e)
         {
-            UiToPlan();
-            using var saveFileDialog = new SaveFileDialog
+            InTryCatch(() =>
             {
-                Filter = MergeSolutionsPlanFilter,
-                FilterIndex = 1,
-                FileName = _mergePlan.PlanName,
-                RestoreDirectory = true
-            };
-
-            if (saveFileDialog.ShowDialog() == DialogResult.OK)
-            {
-                var stream = saveFileDialog.OpenFile();
-                using (stream)
+                UiToPlan();
+                using var saveFileDialog = new SaveFileDialog
                 {
-                    JsonSerializer.Serialize(stream, _mergePlan, new JsonSerializerOptions
-                    {
-                        WriteIndented = true
-                    });
-                    _mergePlan.PlanName = Path.GetFileNameWithoutExtension(saveFileDialog.FileName);
-                }
+                    Filter = MergeSolutionsPlanFilter,
+                    FilterIndex = 1,
+                    FileName = _mergePlan.PlanName,
+                    RestoreDirectory = true
+                };
 
-                PlanToUi();
+                if (saveFileDialog.ShowDialog() == DialogResult.OK)
+                {
+                    var stream = saveFileDialog.OpenFile();
+                    using (stream)
+                    {
+                        JsonSerializer.Serialize(stream, _mergePlan, new JsonSerializerOptions
+                        {
+                            WriteIndented = true
+                        });
+                        _mergePlan.PlanName = Path.GetFileNameWithoutExtension(saveFileDialog.FileName);
+                    }
+
+                    PlanToUi();
+                }
+            });
+        }
+
+        private void InTryCatch(Action action, string? message = null, string? caption = null)
+        {
+            try
+            {
+                action();
+            }
+            catch (Exception e)
+            {
+                Program.ShowExceptionMessage(message ?? "Operation failed", e, caption ?? "Operation failed");
             }
         }
 

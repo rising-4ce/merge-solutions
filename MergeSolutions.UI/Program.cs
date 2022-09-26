@@ -10,13 +10,13 @@ namespace MergeSolutions.UI
     {
         public static IServiceProvider ServiceProvider { get; private set; } = null!;
 
-        public static void ShowExceptionMessage(string message, Exception? exception)
+        public static void ShowExceptionMessage(string message, Exception? exception, string? caption = null)
         {
             MessageBox.Show(@$"{message} 
 
 {exception?.Message}
 {exception?.InnerException?.Message}",
-                "Exception",
+                caption ?? "Error",
                 MessageBoxButtons.OK,
                 MessageBoxIcon.Error);
         }
