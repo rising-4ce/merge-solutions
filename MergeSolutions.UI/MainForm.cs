@@ -129,11 +129,6 @@ namespace MergeSolutions.UI
             }
         }
 
-        private void exitToolStripMenuItem_Click(object sender, EventArgs e)
-        {
-            Close();
-        }
-
         private void LoadMergePlan(string fileName)
         {
             var content = File.ReadAllText(fileName);
@@ -175,6 +170,32 @@ namespace MergeSolutions.UI
 
                 treeViewSolutions.Nodes.Add(solutionNode);
                 solutionNode.Expand();
+            }
+        }
+
+        private void treeViewSolutions_AfterCheck(object sender, TreeViewEventArgs e)
+        {
+            foreach (TreeNode nodeNode in e.Node!.Nodes)
+            {
+                nodeNode.Checked = e.Node.Checked;
+            }
+        }
+
+        private void treeViewSolutions_KeyUp(object sender, KeyEventArgs e)
+        {
+            if (e.KeyCode == Keys.Delete)
+            {
+                if (sender is TreeView treeView)
+                {
+                    var selectedNode = treeView.SelectedNode;
+                    // Allow root level nodes removing only
+                    if (selectedNode.Parent != null)
+                    {
+                        return;
+                    }
+
+                    treeView.Nodes.Remove(selectedNode);
+                }
             }
         }
 

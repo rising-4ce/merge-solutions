@@ -40,16 +40,16 @@
             // 
             // textBoxOutputSolutionPath
             // 
-            this.textBoxOutputSolutionPath.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left) 
+            this.textBoxOutputSolutionPath.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left) 
             | System.Windows.Forms.AnchorStyles.Right)));
-            this.textBoxOutputSolutionPath.Location = new System.Drawing.Point(161, 476);
+            this.textBoxOutputSolutionPath.Location = new System.Drawing.Point(161, 42);
             this.textBoxOutputSolutionPath.Name = "textBoxOutputSolutionPath";
             this.textBoxOutputSolutionPath.Size = new System.Drawing.Size(711, 23);
             this.textBoxOutputSolutionPath.TabIndex = 2;
             // 
             // buttonBrowseOutputSolutionPath
             // 
-            this.buttonBrowseOutputSolutionPath.Location = new System.Drawing.Point(12, 187);
+            this.buttonBrowseOutputSolutionPath.Location = new System.Drawing.Point(12, 41);
             this.buttonBrowseOutputSolutionPath.Name = "buttonBrowseOutputSolutionPath";
             this.buttonBrowseOutputSolutionPath.Size = new System.Drawing.Size(143, 23);
             this.buttonBrowseOutputSolutionPath.TabIndex = 3;
@@ -62,14 +62,16 @@
             this.treeViewSolutions.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
             | System.Windows.Forms.AnchorStyles.Left) 
             | System.Windows.Forms.AnchorStyles.Right)));
-            this.treeViewSolutions.Location = new System.Drawing.Point(161, 12);
+            this.treeViewSolutions.Location = new System.Drawing.Point(161, 71);
             this.treeViewSolutions.Name = "treeViewSolutions";
-            this.treeViewSolutions.Size = new System.Drawing.Size(711, 458);
+            this.treeViewSolutions.Size = new System.Drawing.Size(711, 399);
             this.treeViewSolutions.TabIndex = 4;
+            this.treeViewSolutions.AfterCheck += new System.Windows.Forms.TreeViewEventHandler(this.treeViewSolutions_AfterCheck);
+            this.treeViewSolutions.KeyUp += new System.Windows.Forms.KeyEventHandler(this.treeViewSolutions_KeyUp);
             // 
             // buttonAppendSolution
             // 
-            this.buttonAppendSolution.Location = new System.Drawing.Point(12, 128);
+            this.buttonAppendSolution.Location = new System.Drawing.Point(12, 71);
             this.buttonAppendSolution.Name = "buttonAppendSolution";
             this.buttonAppendSolution.Size = new System.Drawing.Size(143, 23);
             this.buttonAppendSolution.TabIndex = 6;
@@ -89,7 +91,7 @@
             // 
             // buttonOpenPlan
             // 
-            this.buttonOpenPlan.Location = new System.Drawing.Point(12, 66);
+            this.buttonOpenPlan.Location = new System.Drawing.Point(161, 12);
             this.buttonOpenPlan.Name = "buttonOpenPlan";
             this.buttonOpenPlan.Size = new System.Drawing.Size(143, 23);
             this.buttonOpenPlan.TabIndex = 8;
@@ -100,7 +102,7 @@
             // buttonRunMerge
             // 
             this.buttonRunMerge.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left)));
-            this.buttonRunMerge.Location = new System.Drawing.Point(12, 476);
+            this.buttonRunMerge.Location = new System.Drawing.Point(161, 476);
             this.buttonRunMerge.Name = "buttonRunMerge";
             this.buttonRunMerge.Size = new System.Drawing.Size(143, 23);
             this.buttonRunMerge.TabIndex = 9;
@@ -110,7 +112,8 @@
             // 
             // buttonSaveMergePlan
             // 
-            this.buttonSaveMergePlan.Location = new System.Drawing.Point(12, 245);
+            this.buttonSaveMergePlan.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left)));
+            this.buttonSaveMergePlan.Location = new System.Drawing.Point(12, 476);
             this.buttonSaveMergePlan.Name = "buttonSaveMergePlan";
             this.buttonSaveMergePlan.Size = new System.Drawing.Size(142, 23);
             this.buttonSaveMergePlan.TabIndex = 10;
