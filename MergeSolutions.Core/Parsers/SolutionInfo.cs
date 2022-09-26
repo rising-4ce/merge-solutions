@@ -93,8 +93,7 @@ namespace MergeSolutions.Core.Parsers
             return $@"Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio Version 17
 VisualStudioVersion = 17.3.32901.215
-MinimumVisualStudioVersion = 10.0.40219.1
-{projectsSection}
+MinimumVisualStudioVersion = 10.0.40219.1{projectsSection}
 Global
 {SolutionPlatformsSection}
 {ProjectPlatformsSection}
