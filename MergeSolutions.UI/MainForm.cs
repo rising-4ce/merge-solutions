@@ -38,6 +38,7 @@ namespace MergeSolutions.UI
         {
             InTryCatch(() =>
             {
+                UiToPlan();
                 using var openFileDialog = new OpenFileDialog
                 {
                     Filter = SolutionFilter,
@@ -114,7 +115,7 @@ namespace MergeSolutions.UI
                 UiToPlan();
                 _mergeSolutionsService.MergeSolutions(_mergePlan);
                 PlanToUi();
-                MessageBox.Show("Done");
+                MessageBox.Show("Merged solution is created.", AppName, MessageBoxButtons.OK, MessageBoxIcon.Information);
             });
         }
 
