@@ -3,11 +3,16 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio Version 17
 VisualStudioVersion = 17.3.32901.215
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ClassLibrary1", "ClassLibrary1\ClassLibrary1.csproj", "{EADACA47-6660-4693-A6A8-6ACFF1CF6A46}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "ClassLibrary1", "ClassLibrary1\ClassLibrary1.csproj", "{EADACA47-6660-4693-A6A8-6ACFF1CF6A46}"
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "InFolderB", "InFolderB", "{8C9DBCF6-C2A9-4D55-BD48-AADF40240336}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "InSolutionFolderClassLibraryB", "InSolutionFolderClassLibraryB\InSolutionFolderClassLibraryB.csproj", "{E77589E3-8B28-4BEC-B486-73720938DF07}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "InSolutionFolderClassLibraryB", "InSolutionFolderClassLibraryB\InSolutionFolderClassLibraryB.csproj", "{E77589E3-8B28-4BEC-B486-73720938DF07}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution Items", "{A1A2656E-4DC0-42CF-A0C2-4D0B66CDDB9B}"
+	ProjectSection(SolutionItems) = preProject
+		2.txt = 2.txt
+	EndProjectSection
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution

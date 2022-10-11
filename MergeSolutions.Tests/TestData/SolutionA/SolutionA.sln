@@ -3,13 +3,18 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio Version 17
 VisualStudioVersion = 17.3.32901.215
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ClassLibrary1", "ClassLibrary1\ClassLibrary1.csproj", "{23030AF7-941A-498B-805B-2EF13D6982E7}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "ClassLibrary1", "ClassLibrary1\ClassLibrary1.csproj", "{23030AF7-941A-498B-805B-2EF13D6982E7}"
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "InFolder", "InFolder", "{8FE39D73-9DBF-47A0-94E3-24F96625B4EA}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "InDiskFolderClassLibrary", "InDiskFolder\InDiskFolderClassLibrary\InDiskFolderClassLibrary.csproj", "{177D7443-2536-4B05-8CBD-5FAD3CE75FD3}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "InDiskFolderClassLibrary", "InDiskFolder\InDiskFolderClassLibrary\InDiskFolderClassLibrary.csproj", "{177D7443-2536-4B05-8CBD-5FAD3CE75FD3}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "InSolutionFolderClassLibrary", "InSolutionFolderClassLibrary\InSolutionFolderClassLibrary.csproj", "{2DA8C987-D5E9-4756-930E-1EBE4AC8D0AD}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "InSolutionFolderClassLibrary", "InSolutionFolderClassLibrary\InSolutionFolderClassLibrary.csproj", "{2DA8C987-D5E9-4756-930E-1EBE4AC8D0AD}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution Items", "{78A19B75-A786-4AFB-A238-DAA45EA72D6A}"
+	ProjectSection(SolutionItems) = preProject
+		1.txt = 1.txt
+	EndProjectSection
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
