@@ -27,6 +27,8 @@ namespace MergeSolutions.Core.Parsers
 
         public SolutionPropertiesInfo PropsSection { get; }
 
+        public string RelativePath { get; set; }
+
         public SolutionConfigurationPlatformsInfo SolutionPlatformsSection { get; private set; }
 
         public string? Text { get; private init; }
@@ -73,9 +75,10 @@ namespace MergeSolutions.Core.Parsers
 
         public static SolutionInfo Parse(string slnPath, string? rootDir = null)
         {
+            rootDir ??= Environment.CurrentDirectory;
             if (!Path.IsPathFullyQualified(slnPath))
             {
-                slnPath = Path.Combine(rootDir ?? Environment.CurrentDirectory, slnPath);
+                slnPath = Path.Combine(rootDir, slnPath);
             }
 
             var slnText = File.ReadAllText(slnPath);
@@ -92,6 +95,7 @@ namespace MergeSolutions.Core.Parsers
             sln.NestedSection = NestedProjectsInfo.Parse(sln.Projects, slnText);
             sln.SolutionPlatformsSection = SolutionConfigurationPlatformsInfo.Parse(slnText);
             sln.ProjectPlatformsSection = ProjectConfigurationPlatformsInfo.Parse(slnText);
+            sln.RelativePath = Path.GetRelativePath(rootDir, slnPath);
 
             return sln;
         }

@@ -6,17 +6,16 @@ namespace MergeSolutions.Core.Services
     {
         public SolutionInfo MergeSolutions(MergePlan mergePlan)
         {
-            var outputSlnPath = Path.GetFullPath(mergePlan.OutputSolutionPath);
-
             var solutions = mergePlan.Solutions
                 .Where(s => s.RelativePath != null)
                 .Select(s => SolutionInfo.Parse(s.RelativePath!, mergePlan.RootDir))
                 .ToArray();
 
+            var outputSlnPath = Path.Combine(mergePlan.RootDir!, mergePlan.OutputSolutionPath);
             var mergedSolution = SolutionInfo.MergeSolutions(Path.GetFileNameWithoutExtension(outputSlnPath),
                 Path.GetDirectoryName(outputSlnPath) ?? "",
                 out var warnings,
-                project => !mergePlan.IsExcluded(project.SolutionName, project.Guid),
+                project => !mergePlan.IsExcluded(project),
                 solutions);
 
             // Remove empty solution directories

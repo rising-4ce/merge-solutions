@@ -215,7 +215,7 @@ namespace MergeSolutions.UI
                 {
                     var projectNode = new TreeNode(project.Name)
                     {
-                        Checked = !_mergePlan.IsExcluded(solutionEntity.RelativePath, project.Guid),
+                        Checked = !_mergePlan.IsExcluded(project),
                         Tag = project.Guid
                     };
 

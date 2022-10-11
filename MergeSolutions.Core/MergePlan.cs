@@ -49,9 +49,15 @@ namespace MergeSolutions.Core
             return mergePlan;
         }
 
-        public bool IsExcluded(string? solutionName, string? projectGuid)
+        public bool IsExcluded(BaseProject baseProject)
         {
-            return ExcludedProjects.Any(e => e.Key == solutionName && e.Value == projectGuid);
+            if (baseProject is not Project project)
+            {
+                return false;
+            }
+
+            return ExcludedProjects.Any(e =>
+                e.Key == project.ProjectInfo.SolutionInfo?.RelativePath && e.Value == baseProject.Guid);
         }
 
         public void RecalculateRootDir(string? rootDir)
