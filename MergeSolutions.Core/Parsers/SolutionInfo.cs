@@ -128,7 +128,7 @@ EndGlobal
         {
             foreach (var projectDirectory in allProjects.OfType<ProjectDirectory>())
             {
-                if (projectDirectory.Name == "Solution Items")
+                if (string.Equals(projectDirectory.Name, "Solution Items", StringComparison.OrdinalIgnoreCase))
                 {
                     projectDirectory.OverridingName = "Inner Solution Items";
                 }
