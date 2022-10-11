@@ -1,4 +1,5 @@
 using System.Runtime.CompilerServices;
+using MergeSolutions.Core;
 using MergeSolutions.Core.Services;
 using Microsoft.Extensions.DependencyInjection;
 
@@ -50,6 +51,7 @@ namespace MergeSolutions.UI
                 var services = new ServiceCollection();
                 services.AddTransient<MainForm>();
                 services.AddSingleton<IMergeSolutionsService, MergeSolutionService>();
+                services.AddSingleton<IMigrator, Migrator>();
                 services.AddSingleton<ISolutionService, SolutionService>();
                 services.AddTransient<IStartup>(_ => new Startup(args.ElementAtOrDefault(0)));
                 ServiceProvider = services.BuildServiceProvider();

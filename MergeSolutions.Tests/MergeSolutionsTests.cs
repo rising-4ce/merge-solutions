@@ -22,7 +22,7 @@ namespace MergeSolutions.Tests
                 Path.GetDirectoryName(outputSolutionPath) ?? "",
                 out _,
                 null,
-                solutionPaths.Select(SolutionInfo.Parse).ToArray());
+                solutionPaths.Select(n => SolutionInfo.Parse(n)).ToArray());
             mergedSolution.Save();
 
             var solutionInfo = SolutionInfo.Parse(outputSolutionPath);
@@ -75,7 +75,7 @@ namespace MergeSolutions.Tests
                 Path.GetDirectoryName(outputSolutionPath) ?? "",
                 out _,
                 null,
-                solutionPaths.Select(SolutionInfo.Parse).ToArray());
+                solutionPaths.Select(n => SolutionInfo.Parse(n)).ToArray());
             mergedSolution.Save();
 
             var solutionInfo = SolutionInfo.Parse(outputSolutionPath);
@@ -160,7 +160,7 @@ namespace MergeSolutions.Tests
 
                     return true;
                 },
-                solutionPaths.Select(SolutionInfo.Parse).ToArray());
+                solutionPaths.Select(n => SolutionInfo.Parse(n)).ToArray());
             mergedSolution.Save();
 
             var solutionInfo = SolutionInfo.Parse(outputSolutionPath);
@@ -181,7 +181,7 @@ namespace MergeSolutions.Tests
 
                     return true;
                 },
-                solutionPaths.Select(SolutionInfo.Parse).ToArray());
+                solutionPaths.Select(n => SolutionInfo.Parse(n)).ToArray());
             mergedSolution.Save();
 
             solutionInfo = SolutionInfo.Parse(outputSolutionPath);

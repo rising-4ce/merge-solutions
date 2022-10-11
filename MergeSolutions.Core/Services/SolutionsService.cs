@@ -4,9 +4,9 @@ namespace MergeSolutions.Core.Services
 {
     public class SolutionService : ISolutionService
     {
-        public SolutionInfo ParseSolution(string path)
+        public SolutionInfo ParseSolution(string path, string? rootDir)
         {
-            return SolutionInfo.Parse(path);
+            return SolutionInfo.Parse(path, rootDir);
         }
     }
 }

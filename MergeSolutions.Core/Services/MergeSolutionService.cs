@@ -8,7 +8,10 @@ namespace MergeSolutions.Core.Services
         {
             var outputSlnPath = Path.GetFullPath(mergePlan.OutputSolutionPath);
 
-            var solutions = mergePlan.Solutions.Select(p => p.Value).Select(SolutionInfo.Parse).ToArray();
+            var solutions = mergePlan.Solutions
+                .Where(s => s.RelativePath != null)
+                .Select(s => SolutionInfo.Parse(s.RelativePath!, mergePlan.RootDir))
+                .ToArray();
 
             var mergedSolution = SolutionInfo.MergeSolutions(Path.GetFileNameWithoutExtension(outputSlnPath),
                 Path.GetDirectoryName(outputSlnPath) ?? "",

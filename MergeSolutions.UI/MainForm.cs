@@ -1,4 +1,3 @@
-using System.Text.Json;
 using MergeSolutions.Core;
 using MergeSolutions.Core.Models;
 using MergeSolutions.Core.Services;
@@ -19,14 +18,18 @@ namespace MergeSolutions.UI
 
         private readonly IMergeSolutionsService _mergeSolutionsService;
 
+        private readonly IMigrator _migrator;
+
         private readonly ISolutionService _solutionService;
 
         private MergePlan _mergePlan = new MergePlan();
 
-        public MainForm(IMergeSolutionsService mergeSolutionsService, ISolutionService solutionService, IStartup startup)
+        public MainForm(IMergeSolutionsService mergeSolutionsService, ISolutionService solutionService, IStartup startup,
+            IMigrator migrator)
         {
             _mergeSolutionsService = mergeSolutionsService;
             _solutionService = solutionService;
+            _migrator = migrator;
             InitializeComponent();
             if (startup.PlanPath != null)
             {
@@ -51,8 +54,16 @@ namespace MergeSolutions.UI
                     var stream = openFileDialog.OpenFile();
                     using (stream)
                     {
-                        var solutionName = Path.GetFileNameWithoutExtension(openFileDialog.SafeFileName);
-                        _mergePlan.Solutions[solutionName] = openFileDialog.FileName;
+                        var relativePath = Path.GetRelativePath(Environment.CurrentDirectory, openFileDialog.FileName);
+                        var solutionInfo = _solutionService.ParseSolution(relativePath, Environment.CurrentDirectory);
+                        _mergePlan.Solutions.RemoveAll(s => s.RelativePath == relativePath);
+                        _mergePlan.Solutions.Add(new SolutionEntity
+                        {
+                            RelativePath = relativePath,
+                            NodeName = solutionInfo.Name,
+                            Collapsed = false
+                        });
+
                         PlanToUi();
                     }
                 }
@@ -129,21 +140,13 @@ namespace MergeSolutions.UI
                     Filter = MergeSolutionsPlanFilter,
                     FilterIndex = 1,
                     FileName = _mergePlan.PlanName,
+                    InitialDirectory = _mergePlan.RootDir,
                     RestoreDirectory = true
                 };
 
                 if (saveFileDialog.ShowDialog() == DialogResult.OK)
                 {
-                    var stream = saveFileDialog.OpenFile();
-                    using (stream)
-                    {
-                        JsonSerializer.Serialize(stream, _mergePlan, new JsonSerializerOptions
-                        {
-                            WriteIndented = true
-                        });
-                        _mergePlan.PlanName = Path.GetFileNameWithoutExtension(saveFileDialog.FileName);
-                    }
-
+                    _mergePlan.SaveMergePlanFile(saveFileDialog.FileName);
                     PlanToUi();
                 }
             });
@@ -163,10 +166,7 @@ namespace MergeSolutions.UI
 
         private void LoadMergePlan(string fileName)
         {
-            var content = File.ReadAllText(fileName);
-            var mergePlan = JsonSerializer.Deserialize<MergePlan>(content) ?? new MergePlan();
-            mergePlan.PlanName = Path.GetFileNameWithoutExtension(fileName);
-            _mergePlan = mergePlan;
+            _mergePlan = MergePlan.LoadMergePlanFile(fileName, _migrator);
             PlanToUi();
         }
 
@@ -181,19 +181,25 @@ namespace MergeSolutions.UI
             textBoxOutputSolutionPath.Text = _mergePlan.OutputSolutionPath;
             treeViewSolutions.Nodes.Clear();
             treeViewSolutions.CheckBoxes = true;
-            foreach (var solution in _mergePlan.Solutions.OrderBy(s => s.Key))
+            foreach (var solutionEntity in _mergePlan.Solutions.OrderBy(s => s.NodeName))
             {
-                var solutionInfo = _solutionService.ParseSolution(solution.Value);
-                var solutionNode = new TreeNode(solution.Key)
+                if (solutionEntity.RelativePath == null)
                 {
-                    Checked = true
+                    continue;
+                }
+
+                var solutionInfo = _solutionService.ParseSolution(solutionEntity.RelativePath, _mergePlan.RootDir);
+                var solutionNode = new SolutionTreeNode(solutionEntity.NodeName ?? solutionInfo.Name, solutionEntity.RelativePath)
+                {
+                    Checked = true,
+                    Tag = solutionEntity
                 };
 
                 foreach (var project in solutionInfo.Projects.OfType<Project>().OrderBy(p => p.Name))
                 {
                     var projectNode = new TreeNode(project.Name)
                     {
-                        Checked = !_mergePlan.IsExcluded(project.SolutionName, project.Guid),
+                        Checked = !_mergePlan.IsExcluded(solutionEntity.RelativePath, project.Guid),
                         Tag = project.Guid
                     };
 
@@ -201,7 +207,10 @@ namespace MergeSolutions.UI
                 }
 
                 treeViewSolutions.Nodes.Add(solutionNode);
-                solutionNode.Expand();
+                if (!solutionEntity.Collapsed)
+                {
+                    solutionNode.Expand();
+                }
             }
         }
 
@@ -235,13 +244,20 @@ namespace MergeSolutions.UI
         {
             _mergePlan.OutputSolutionPath = textBoxOutputSolutionPath.Text;
             var excludedProjects = new List<KeyValuePair<string, string>>();
-            foreach (TreeNode solutionNode in treeViewSolutions.Nodes)
+            foreach (SolutionTreeNode solutionTreeNode in treeViewSolutions.Nodes)
             {
-                foreach (TreeNode projectNode in solutionNode.Nodes)
+                if (solutionTreeNode.Tag is SolutionEntity solutionEntity)
                 {
-                    if (!projectNode.Checked)
+                    solutionEntity.NodeName = solutionTreeNode.NodeName;
+                    solutionEntity.Collapsed = !solutionTreeNode.IsExpanded;
+
+                    foreach (TreeNode projectNode in solutionTreeNode.Nodes)
                     {
-                        excludedProjects.Add(new KeyValuePair<string, string>(solutionNode.Text, (string)projectNode.Tag));
+                        if (!projectNode.Checked)
+                        {
+                            excludedProjects.Add(new KeyValuePair<string, string>(solutionEntity.RelativePath!,
+                                (string)projectNode.Tag));
+                        }
                     }
                 }
             }

@@ -71,13 +71,14 @@ namespace SolutionMerger
 
             if (fixDupeGuids)
             {
-                ProjectReferenceFixer.FixAllSolutions(solutionNames.Select(SolutionInfo.Parse).ToArray(), out errors);
+                ProjectReferenceFixer.FixAllSolutions(solutionNames.Select(n => SolutionInfo.Parse(n, null)).ToArray(),
+                    out errors);
             }
 
             outputSlnPath = Path.GetFullPath(outputSlnPath);
             var aggregateSolution = SolutionInfo.MergeSolutions(Path.GetFileNameWithoutExtension(outputSlnPath),
                 Path.GetDirectoryName(outputSlnPath) ?? "", out var warnings, null,
-                solutionNames.Select(SolutionInfo.Parse).ToArray());
+                solutionNames.Select(n => SolutionInfo.Parse(n, null)).ToArray());
             aggregateSolution.Save();
 
             Console.WriteLine("Merged solution: {0}", outputSlnPath);

@@ -4,6 +4,6 @@ namespace MergeSolutions.Core.Services
 {
     public interface ISolutionService
     {
-        SolutionInfo ParseSolution(string path);
+        SolutionInfo ParseSolution(string path, string? rootDir);
     }
 }

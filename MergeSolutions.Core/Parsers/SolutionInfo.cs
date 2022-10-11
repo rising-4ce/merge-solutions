@@ -71,8 +71,13 @@ namespace MergeSolutions.Core.Parsers
             return mergedSln;
         }
 
-        public static SolutionInfo Parse(string slnPath)
+        public static SolutionInfo Parse(string slnPath, string? rootDir = null)
         {
+            if (!Path.IsPathFullyQualified(slnPath))
+            {
+                slnPath = Path.Combine(rootDir ?? Environment.CurrentDirectory, slnPath);
+            }
+
             var slnText = File.ReadAllText(slnPath);
             var path = Path.GetFullPath(slnPath);
             var slnBaseDir = Path.GetDirectoryName(path);
