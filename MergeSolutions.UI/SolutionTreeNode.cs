@@ -1,29 +1,28 @@
-﻿namespace MergeSolutions.UI
+﻿using MergeSolutions.Core.Models;
+
+namespace MergeSolutions.UI
 {
     internal class SolutionTreeNode : TreeNode
     {
-        private string _nodeName = null!;
-
-        public SolutionTreeNode(string nodeName, string relativePath)
+        public SolutionTreeNode(SolutionEntity solutionEntity)
         {
-            RelativePath = relativePath;
-            //Init RelativePath before NodeName
-            NodeName = nodeName;
+            SolutionEntity = solutionEntity;
+            NodeName = solutionEntity.NodeName ?? "";
         }
 
         public string NodeName
         {
-            get => _nodeName;
+            get => SolutionEntity.NodeName ?? "";
             set
             {
-                _nodeName = value;
-                Text = SolutionNodeText(_nodeName, RelativePath);
+                SolutionEntity.NodeName = value;
+                Text = SolutionNodeText(value, SolutionEntity.RelativePath);
             }
         }
 
-        public string RelativePath { get; }
+        public SolutionEntity SolutionEntity { get; }
 
-        private static string SolutionNodeText(string nodeName, string relativePath)
+        private static string SolutionNodeText(string nodeName, string? relativePath)
         {
             return $"{nodeName} ({relativePath})";
         }

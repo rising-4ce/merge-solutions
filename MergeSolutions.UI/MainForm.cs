@@ -189,10 +189,26 @@ namespace MergeSolutions.UI
                 }
 
                 var solutionInfo = _solutionService.ParseSolution(solutionEntity.RelativePath, _mergePlan.RootDir);
-                var solutionNode = new SolutionTreeNode(solutionEntity.NodeName ?? solutionInfo.Name, solutionEntity.RelativePath)
+                solutionEntity.NodeName ??= solutionInfo.Name;
+                var solutionTreeNode = new SolutionTreeNode(solutionEntity)
                 {
-                    Checked = true,
-                    Tag = solutionEntity
+                    Checked = true
+                };
+
+                solutionTreeNode.ContextMenuStrip = new ContextMenuStrip()
+                {
+                    Items =
+                    {
+                        {
+                            "Rename", null, (sender, args) =>
+                            {
+                                treeViewSolutions.LabelEdit = true;
+                                solutionTreeNode.Text = solutionTreeNode.SolutionEntity.NodeName;
+                                solutionTreeNode.BeginEdit();
+                            }
+                        },
+                        {"Delete", null, (sender, args) => { treeViewSolutions.Nodes.Remove(solutionTreeNode); }}
+                    }
                 };
 
                 foreach (var project in solutionInfo.Projects.OfType<Project>().OrderBy(p => p.Name))
@@ -203,13 +219,13 @@ namespace MergeSolutions.UI
                         Tag = project.Guid
                     };
 
-                    solutionNode.Nodes.Add(projectNode);
+                    solutionTreeNode.Nodes.Add(projectNode);
                 }
 
-                treeViewSolutions.Nodes.Add(solutionNode);
+                treeViewSolutions.Nodes.Add(solutionTreeNode);
                 if (!solutionEntity.Collapsed)
                 {
-                    solutionNode.Expand();
+                    solutionTreeNode.Expand();
                 }
             }
         }
@@ -219,6 +235,16 @@ namespace MergeSolutions.UI
             foreach (TreeNode nodeNode in e.Node!.Nodes)
             {
                 nodeNode.Checked = e.Node.Checked;
+            }
+        }
+
+        private void treeViewSolutions_AfterLabelEdit(object sender, NodeLabelEditEventArgs e)
+        {
+            e.CancelEdit = true;
+            if (e.Node is SolutionTreeNode solutionTreeNode)
+            {
+                var nodeText = e.Label;
+                solutionTreeNode.NodeName = nodeText;
             }
         }
 
@@ -246,18 +272,15 @@ namespace MergeSolutions.UI
             var excludedProjects = new List<KeyValuePair<string, string>>();
             foreach (SolutionTreeNode solutionTreeNode in treeViewSolutions.Nodes)
             {
-                if (solutionTreeNode.Tag is SolutionEntity solutionEntity)
-                {
-                    solutionEntity.NodeName = solutionTreeNode.NodeName;
-                    solutionEntity.Collapsed = !solutionTreeNode.IsExpanded;
+                solutionTreeNode.SolutionEntity.NodeName = solutionTreeNode.NodeName;
+                solutionTreeNode.SolutionEntity.Collapsed = !solutionTreeNode.IsExpanded;
 
-                    foreach (TreeNode projectNode in solutionTreeNode.Nodes)
+                foreach (TreeNode projectNode in solutionTreeNode.Nodes)
+                {
+                    if (!projectNode.Checked)
                     {
-                        if (!projectNode.Checked)
-                        {
-                            excludedProjects.Add(new KeyValuePair<string, string>(solutionEntity.RelativePath!,
-                                (string)projectNode.Tag));
-                        }
+                        excludedProjects.Add(new KeyValuePair<string, string>(solutionTreeNode.SolutionEntity.RelativePath!,
+                            (string)projectNode.Tag));
                     }
                 }
             }
