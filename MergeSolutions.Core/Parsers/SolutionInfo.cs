@@ -54,6 +54,8 @@ namespace MergeSolutions.Core.Parsers
 
             warnings = SolutionDiagnostics.DiagnoseDupeGuids(solutions);
 
+            FixSolutionItems(allProjects);
+
             var mergedSln = new SolutionInfo(newName, baseDir, solutions[0].PropsSection)
             {
                 Projects = allProjects
@@ -120,6 +122,17 @@ Global
 {NestedSection}
 EndGlobal
 ";
+        }
+
+        private static void FixSolutionItems(List<BaseProject> allProjects)
+        {
+            foreach (var projectDirectory in allProjects.OfType<ProjectDirectory>())
+            {
+                if (projectDirectory.Name == "Solution Items")
+                {
+                    projectDirectory.OverridingName = "Inner Solution Items";
+                }
+            }
         }
 
         private SolutionInfo CreateNestedDirs()

@@ -19,7 +19,7 @@ namespace MergeSolutions.Core.Models
 
         public abstract string Location { get; }
 
-        public string Name { get; }
+        public virtual string Name { get; }
 
         public ProjectInfo ProjectInfo { get; }
 

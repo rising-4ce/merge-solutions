@@ -17,8 +17,12 @@ namespace MergeSolutions.Core.Models
 
         public override string Location => Name;
 
+        public override string Name => OverridingName ?? base.Name;
+
         public List<ProjectRelationInfo> NestedProjects { get; }
 
         public NestedProjectsInfo? NestedProjectsInfo { get; set; }
+
+        public string? OverridingName { get; set; }
     }
 }

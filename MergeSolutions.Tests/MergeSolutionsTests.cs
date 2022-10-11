@@ -1,4 +1,5 @@
 ﻿using FluentAssertions;
+using MergeSolutions.Core.Models;
 using MergeSolutions.Core.Parsers;
 using Xunit;
 
@@ -27,7 +28,7 @@ namespace MergeSolutions.Tests
 
             var solutionInfo = SolutionInfo.Parse(outputSolutionPath);
 
-            solutionInfo.Projects.Should().HaveCount(5);
+            solutionInfo.Projects.Should().HaveCount(6);
             solutionInfo.NestedSection.Dirs.Should().HaveCount(2);
             solutionInfo.NestedSection.Dirs.Should()
                 .Contain(p => p.Guid == "{8FE39D73-9DBF-47A0-94E3-24F96625B4EA}");
@@ -36,9 +37,12 @@ namespace MergeSolutions.Tests
                 .Contain(p => p.Project.Guid == "{177D7443-2536-4B05-8CBD-5FAD3CE75FD3}");
             inFolderDir.NestedProjects.Should()
                 .Contain(p => p.Project.Guid == "{2DA8C987-D5E9-4756-930E-1EBE4AC8D0AD}");
-            var solutionNamedSubDir = solutionInfo.NestedSection.Dirs.Single(d => d != inFolderDir);
+            var solutionNamedSubDir = solutionInfo.NestedSection.Dirs.Single(d => d.Name == "SolutionA");
+            var innerSolutionItemsSubDir =
+                solutionNamedSubDir.NestedProjects.Single(d => d.Project.Name == "Inner Solution Items");
+            innerSolutionItemsSubDir.Project.ProjectInfo.All.Should().Contain("1.txt");
             solutionNamedSubDir.Name.Should().Be("SolutionA");
-            solutionNamedSubDir.NestedProjects.Should().HaveCount(2);
+            solutionNamedSubDir.NestedProjects.Should().HaveCount(3);
             solutionNamedSubDir.NestedProjects.Should()
                 .Contain(p => p.Project.Guid == "{8FE39D73-9DBF-47A0-94E3-24F96625B4EA}");
             solutionNamedSubDir.NestedProjects.Should()
@@ -80,7 +84,7 @@ namespace MergeSolutions.Tests
 
             var solutionInfo = SolutionInfo.Parse(outputSolutionPath);
 
-            solutionInfo.Projects.Should().HaveCount(9);
+            solutionInfo.Projects.Should().HaveCount(11);
             solutionInfo.NestedSection.Dirs.Should().HaveCount(4);
             solutionInfo.NestedSection.Dirs.Should()
                 .Contain(p => p.Guid == "{8FE39D73-9DBF-47A0-94E3-24F96625B4EA}");
@@ -90,13 +94,19 @@ namespace MergeSolutions.Tests
             inFolderDir.NestedProjects.Should()
                 .Contain(p => p.Project.Guid == "{2DA8C987-D5E9-4756-930E-1EBE4AC8D0AD}");
             var solutionANamedSubDir = solutionInfo.NestedSection.Dirs.Single(d => d.Name == "SolutionA");
-            solutionANamedSubDir.NestedProjects.Should().HaveCount(2);
+            solutionANamedSubDir.NestedProjects.Should().HaveCount(3);
+            var innerSolutionItemsSubDirA =
+                solutionANamedSubDir.NestedProjects.Single(d => d.Project.Name == "Inner Solution Items");
+            innerSolutionItemsSubDirA.Project.ProjectInfo.All.Should().Contain("1.txt");
             solutionANamedSubDir.NestedProjects.Should()
                 .Contain(p => p.Project.Guid == "{8FE39D73-9DBF-47A0-94E3-24F96625B4EA}");
             solutionANamedSubDir.NestedProjects.Should()
                 .Contain(p => p.Project.Guid == "{23030AF7-941A-498B-805B-2EF13D6982E7}");
             var solutionBNamedSubDir = solutionInfo.NestedSection.Dirs.Single(d => d.Name == "SolutionB");
-            solutionBNamedSubDir.NestedProjects.Should().HaveCount(2);
+            solutionBNamedSubDir.NestedProjects.Should().HaveCount(3);
+            var innerSolutionItemsSubDirB =
+                solutionBNamedSubDir.NestedProjects.Single(d => d.Project.Name == "Inner Solution Items");
+            innerSolutionItemsSubDirB.Project.ProjectInfo.All.Should().Contain("2.txt");
             solutionBNamedSubDir.NestedProjects.Should()
                 .Contain(p => p.Project.Guid == "{8C9DBCF6-C2A9-4D55-BD48-AADF40240336}");
             solutionBNamedSubDir.NestedProjects.Should()
@@ -165,7 +175,7 @@ namespace MergeSolutions.Tests
 
             var solutionInfo = SolutionInfo.Parse(outputSolutionPath);
 
-            solutionInfo.Projects.Should().HaveCount(8);
+            solutionInfo.Projects.OfType<Project>().Should().HaveCount(4);
             solutionInfo.Projects.Should().NotContain(p => p.Name == "InSolutionFolderClassLibraryB");
             solutionInfo.Projects.Should().Contain(p => p.Name == "InDiskFolderClassLibrary");
 
@@ -186,7 +196,7 @@ namespace MergeSolutions.Tests
 
             solutionInfo = SolutionInfo.Parse(outputSolutionPath);
 
-            solutionInfo.Projects.Should().HaveCount(8);
+            solutionInfo.Projects.OfType<Project>().Should().HaveCount(4);
             solutionInfo.Projects.Should().Contain(p => p.Name == "InSolutionFolderClassLibraryB");
             solutionInfo.Projects.Should().NotContain(p => p.Name == "InDiskFolderClassLibrary");
         }
