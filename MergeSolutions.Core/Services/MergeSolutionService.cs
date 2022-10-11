@@ -8,7 +8,7 @@ namespace MergeSolutions.Core.Services
         {
             var solutions = mergePlan.Solutions
                 .Where(s => s.RelativePath != null)
-                .Select(s => SolutionInfo.Parse(s.RelativePath!, mergePlan.RootDir))
+                .Select(s => SolutionInfo.Parse(s.RelativePath!, mergePlan.RootDir, s.NodeName))
                 .ToArray();
 
             var outputSlnPath = Path.Combine(mergePlan.RootDir!, mergePlan.OutputSolutionPath);

@@ -73,7 +73,7 @@ namespace MergeSolutions.Core.Parsers
             return mergedSln;
         }
 
-        public static SolutionInfo Parse(string slnPath, string? rootDir = null)
+        public static SolutionInfo Parse(string slnPath, string? rootDir = null, string? overrideName = null)
         {
             rootDir ??= Environment.CurrentDirectory;
             if (!Path.IsPathFullyQualified(slnPath))
@@ -86,7 +86,7 @@ namespace MergeSolutions.Core.Parsers
             var slnBaseDir = Path.GetDirectoryName(path);
             var props = SolutionPropertiesInfo.Parse(slnText);
 
-            var sln = new SolutionInfo(Path.GetFileNameWithoutExtension(path), slnBaseDir!, props)
+            var sln = new SolutionInfo(overrideName ?? Path.GetFileNameWithoutExtension(path), slnBaseDir!, props)
             {
                 Text = slnText
             };
