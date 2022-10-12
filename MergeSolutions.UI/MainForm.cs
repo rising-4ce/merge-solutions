@@ -248,24 +248,6 @@ namespace MergeSolutions.UI
             }
         }
 
-        private void treeViewSolutions_KeyUp(object sender, KeyEventArgs e)
-        {
-            if (e.KeyCode == Keys.Delete)
-            {
-                if (sender is TreeView treeView)
-                {
-                    var selectedNode = treeView.SelectedNode;
-                    // Allow root level nodes removing only
-                    if (selectedNode.Parent != null)
-                    {
-                        return;
-                    }
-
-                    treeView.Nodes.Remove(selectedNode);
-                }
-            }
-        }
-
         private void UiToPlan()
         {
             _mergePlan.OutputSolutionPath = textBoxOutputSolutionPath.Text;

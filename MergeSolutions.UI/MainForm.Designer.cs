@@ -68,7 +68,6 @@
             this.treeViewSolutions.TabIndex = 4;
             this.treeViewSolutions.AfterLabelEdit += new System.Windows.Forms.NodeLabelEditEventHandler(this.treeViewSolutions_AfterLabelEdit);
             this.treeViewSolutions.AfterCheck += new System.Windows.Forms.TreeViewEventHandler(this.treeViewSolutions_AfterCheck);
-            this.treeViewSolutions.KeyUp += new System.Windows.Forms.KeyEventHandler(this.treeViewSolutions_KeyUp);
             // 
             // buttonAppendSolution
             // 
