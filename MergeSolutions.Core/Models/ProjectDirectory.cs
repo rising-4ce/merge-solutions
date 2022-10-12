@@ -15,6 +15,8 @@ namespace MergeSolutions.Core.Models
             NestedProjects = new List<ProjectRelationInfo>();
         }
 
+        public override bool IsEmpty => NestedProjects.Count == 0 && ProjectInfo.All == Environment.NewLine;
+
         public override string Location => Name;
 
         public override string Name => OverridingName ?? base.Name;

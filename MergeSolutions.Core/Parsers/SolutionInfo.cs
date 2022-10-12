@@ -43,6 +43,7 @@ namespace MergeSolutions.Core.Parsers
 
             var allProjects = solutions
                 .SelectMany(s => s.Projects)
+                .Where(p => !p.IsEmpty)
                 .Where(projectFilter ?? (_ => true))
                 .Distinct(BaseProject.ProjectGuidLocationComparer)
                 .ToList();
