@@ -251,7 +251,7 @@ namespace MergeSolutions.UI
             e.CancelEdit = true;
             if (e.Node is SolutionTreeNode solutionTreeNode)
             {
-                var nodeText = e.Label;
+                var nodeText = e.Label ?? solutionTreeNode.NodeName;
                 solutionTreeNode.NodeName = nodeText;
             }
         }
