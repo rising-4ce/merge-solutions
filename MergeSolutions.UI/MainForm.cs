@@ -210,7 +210,13 @@ namespace MergeSolutions.UI
                                     solutionTreeNode.BeginEdit();
                                 }
                             },
-                            {"Delete", null, (_, _) => { treeViewSolutions.Nodes.Remove(solutionTreeNode); }}
+                            {
+                                "Delete", null, (_, _) =>
+                                {
+                                    _mergePlan.Solutions.RemoveAll(s => s == solutionTreeNode.SolutionEntity);
+                                    PlanToUi();
+                                }
+                            }
                         }
                     };
 
