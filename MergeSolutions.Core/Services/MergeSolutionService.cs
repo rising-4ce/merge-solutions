@@ -18,9 +18,10 @@ namespace MergeSolutions.Core.Services
                 project => !mergePlan.IsExcluded(project),
                 solutions);
 
-            // Remove empty solution directories
-            //var emptyProjectDirectories = mergedSolution.Projects.OfType<ProjectDirectory>().Where(pd => mergedSolution.NestedSection.Dirs.All(nd => nd != pd)).ToArray();
-            //mergedSolution.Projects.RemoveAll(p => emptyProjectDirectories.Contains(p));
+            if (!string.IsNullOrWhiteSpace(warnings))
+            {
+                throw new InvalidOperationException(warnings);
+            }
 
             mergedSolution.Save();
             return mergedSolution;

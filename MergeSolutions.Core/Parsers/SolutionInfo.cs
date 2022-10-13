@@ -1,4 +1,5 @@
-﻿using MergeSolutions.Core.Models;
+﻿using System.Runtime.InteropServices;
+using MergeSolutions.Core.Models;
 using MergeSolutions.Core.Parsers.GlobalSection;
 using MergeSolutions.Core.Utils;
 
@@ -77,6 +78,8 @@ namespace MergeSolutions.Core.Parsers
             mergedSln.CreateNestedDirs()
                 .Projects.ForEach(pr => pr.ProjectInfo.SolutionInfo = mergedSln);
 
+            AssignRootLevelDirectoriesDependentSolutionGuid(mergedSln);
+
             return mergedSln;
         }
 
@@ -126,8 +129,28 @@ Global
 {ProjectPlatformsSection}
 {PropsSection}
 {NestedSection}
+{ExtensibilityGlobalsSection}
 EndGlobal
 ";
+        }
+
+        private static void AssignRootLevelDirectoriesDependentSolutionGuid(SolutionInfo mergedSolution)
+        {
+            var guid = Guid.Empty;
+
+            var projectRelationInfos =
+                mergedSolution.Projects.OfType<ProjectDirectory>().SelectMany(p => p.NestedProjects).ToArray();
+            var rootProjectDirectories = projectRelationInfos.Where(p => projectRelationInfos.All(p2 => p2.Project != p.Dir))
+                .Select(p => p.Dir)
+                .Distinct()
+                .OrderBy(p => p.Name).ToArray();
+
+            foreach (var rootProjectDirectory in rootProjectDirectories)
+            {
+                guid = Xor(guid, Guid.Parse(rootProjectDirectory.Guid));
+            }
+
+            mergedSolution.ExtensibilityGlobalsSection.SolutionGuid = guid.ToString("B").ToUpper();
         }
 
         private static void CleanupEmptyDirectoryProjects(List<BaseProject> allProjects)
@@ -169,10 +192,43 @@ EndGlobal
             }
         }
 
+        private static Guid Xor(Guid a, Guid b)
+        {
+            var ad = new DecomposedGuid(a);
+            var bd = new DecomposedGuid(b);
+
+            ad.Hi ^= bd.Hi;
+            ad.Lo ^= bd.Lo;
+
+            return ad.Value;
+        }
+
         private SolutionInfo CreateNestedDirs()
         {
             Project.GenerateProjectDirs(NestedSection, Projects);
             return this;
         }
+
+        #region Nested Type: DecomposedGuid
+
+        [StructLayout(LayoutKind.Explicit)]
+        private struct DecomposedGuid
+        {
+            [FieldOffset(00)]
+            public readonly Guid Value;
+
+            [FieldOffset(00)]
+            public long Hi;
+
+            [FieldOffset(08)]
+            public long Lo;
+
+            public DecomposedGuid(Guid value) : this()
+            {
+                Value = value;
+            }
+        }
+
+        #endregion
     }
 }

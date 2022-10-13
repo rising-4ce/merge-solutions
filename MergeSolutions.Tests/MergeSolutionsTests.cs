@@ -35,6 +35,7 @@ namespace MergeSolutions.Tests
             contents[1].Should().Be(contents[0]);
 
             var solutionInfo = SolutionInfo.Parse(outputSolutionPath);
+            solutionInfo.ExtensibilityGlobalsSection.SolutionGuid.Should().Be("{CAE28B69-4C6B-4930-95FE-1053358566FF}");
             solutionInfo.Projects.Should().HaveCount(6);
             solutionInfo.NestedSection.Dirs.Should().HaveCount(2);
             solutionInfo.NestedSection.Dirs.Should()
@@ -98,6 +99,7 @@ namespace MergeSolutions.Tests
             contents[1].Should().Be(contents[0]);
 
             var solutionInfo = SolutionInfo.Parse(outputSolutionPath);
+            solutionInfo.ExtensibilityGlobalsSection.SolutionGuid.Should().Be("{C579A93F-B294-0413-2A28-15EABAC8DB0F}");
 
             solutionInfo.Projects.Should().HaveCount(11);
             solutionInfo.NestedSection.Dirs.Should().HaveCount(4);

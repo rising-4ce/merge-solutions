@@ -11,7 +11,17 @@
         {
         }
 
-        public string? SolutionGuid =>
-            Lines.FirstOrDefault(l => l.Key == "SolutionGuid", new KeyValuePair<string, string>()).Value;
+        public string? SolutionGuid
+        {
+            get => Lines.FirstOrDefault(l => l.Key == nameof(SolutionGuid)).Value;
+            set
+            {
+                Lines.Remove(Lines.FirstOrDefault(l => l.Key == nameof(SolutionGuid), new KeyValuePair<string, string>()));
+                if (value != null)
+                {
+                    Lines.Add(new KeyValuePair<string, string>(nameof(SolutionGuid), value));
+                }
+            }
+        }
     }
 }
