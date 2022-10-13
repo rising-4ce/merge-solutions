@@ -156,11 +156,18 @@ namespace MergeSolutions.UI
         {
             try
             {
+                Enabled = false;
+                Update();
                 action();
             }
             catch (Exception e)
             {
                 Program.ShowExceptionMessage(message ?? "Operation failed", e, caption ?? "Operation failed");
+            }
+            finally
+            {
+                Enabled = true;
+                Update();
             }
         }
 
@@ -179,54 +186,62 @@ namespace MergeSolutions.UI
         {
             Text = $"{AppName} : {_mergePlan.PlanName}";
             textBoxOutputSolutionPath.Text = _mergePlan.OutputSolutionPath;
-            treeViewSolutions.Nodes.Clear();
-            treeViewSolutions.CheckBoxes = true;
-            foreach (var solutionEntity in _mergePlan.Solutions.OrderBy(s => s.NodeName))
+            try
             {
-                if (solutionEntity.RelativePath == null)
+                treeViewSolutions.BeginUpdate();
+                treeViewSolutions.Nodes.Clear();
+                treeViewSolutions.CheckBoxes = true;
+                foreach (var solutionEntity in _mergePlan.Solutions.OrderBy(s => s.NodeName))
                 {
-                    continue;
-                }
-
-                var solutionInfo = _solutionService.ParseSolution(solutionEntity.RelativePath, _mergePlan.RootDir);
-                solutionEntity.NodeName ??= solutionInfo.Name;
-                var solutionTreeNode = new SolutionTreeNode(solutionEntity)
-                {
-                    Checked = true
-                };
-
-                solutionTreeNode.ContextMenuStrip = new ContextMenuStrip()
-                {
-                    Items =
+                    if (solutionEntity.RelativePath == null)
                     {
-                        {
-                            "Rename", null, (sender, args) =>
-                            {
-                                treeViewSolutions.LabelEdit = true;
-                                solutionTreeNode.Text = solutionTreeNode.SolutionEntity.NodeName;
-                                solutionTreeNode.BeginEdit();
-                            }
-                        },
-                        {"Delete", null, (sender, args) => { treeViewSolutions.Nodes.Remove(solutionTreeNode); }}
+                        continue;
                     }
-                };
 
-                foreach (var project in solutionInfo.Projects.OfType<Project>().OrderBy(p => p.Name))
-                {
-                    var projectNode = new TreeNode(project.Name)
+                    var solutionInfo = _solutionService.ParseSolution(solutionEntity.RelativePath, _mergePlan.RootDir);
+                    solutionEntity.NodeName ??= solutionInfo.Name;
+                    var solutionTreeNode = new SolutionTreeNode(solutionEntity)
                     {
-                        Checked = !_mergePlan.IsExcluded(project),
-                        Tag = project.Guid
+                        Checked = true
                     };
 
-                    solutionTreeNode.Nodes.Add(projectNode);
-                }
+                    solutionTreeNode.ContextMenuStrip = new ContextMenuStrip()
+                    {
+                        Items =
+                        {
+                            {
+                                "Rename", null, (sender, args) =>
+                                {
+                                    treeViewSolutions.LabelEdit = true;
+                                    solutionTreeNode.Text = solutionTreeNode.SolutionEntity.NodeName;
+                                    solutionTreeNode.BeginEdit();
+                                }
+                            },
+                            {"Delete", null, (sender, args) => { treeViewSolutions.Nodes.Remove(solutionTreeNode); }}
+                        }
+                    };
 
-                treeViewSolutions.Nodes.Add(solutionTreeNode);
-                if (!solutionEntity.Collapsed)
-                {
-                    solutionTreeNode.Expand();
+                    foreach (var project in solutionInfo.Projects.OfType<Project>().OrderBy(p => p.Name))
+                    {
+                        var projectNode = new TreeNode(project.Name)
+                        {
+                            Checked = !_mergePlan.IsExcluded(project),
+                            Tag = project.Guid
+                        };
+
+                        solutionTreeNode.Nodes.Add(projectNode);
+                    }
+
+                    treeViewSolutions.Nodes.Add(solutionTreeNode);
+                    if (!solutionEntity.Collapsed)
+                    {
+                        solutionTreeNode.Expand();
+                    }
                 }
+            }
+            finally
+            {
+                treeViewSolutions.EndUpdate();
             }
         }
 
