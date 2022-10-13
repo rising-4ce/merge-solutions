@@ -43,7 +43,7 @@ namespace MergeSolutions.Core.Parsers
         {
             if (solutions.Length == 0)
             {
-                throw new Exception("No solutions");
+                throw new Exception("No solutions to merge.");
             }
 
             var allProjects = solutions
@@ -52,15 +52,15 @@ namespace MergeSolutions.Core.Parsers
                 .Distinct(BaseProject.ProjectGuidLocationComparer)
                 .ToList();
 
-            if (allProjects.Count == 0)
-            {
-                throw new Exception("No projects");
-            }
-
             warnings = SolutionDiagnostics.DiagnoseDupeGuids(solutions);
 
             RenameSolutionItemsDirectoryProjects(allProjects);
             CleanupEmptyDirectoryProjects(allProjects);
+
+            if (allProjects.Count == 0)
+            {
+                throw new Exception("No projects found to include into merged solution.");
+            }
 
             var mergedSln = new SolutionInfo(newName, baseDir, solutions[0].PropsSection)
             {
