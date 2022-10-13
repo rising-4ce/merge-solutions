@@ -8,8 +8,10 @@ namespace MergeSolutions.UI
 {
     public partial class MainForm : Form
     {
+        public const string MergePlanExtension = ".msp1";
+
         public const string MergeSolutionsPlanFilter =
-            "MergeSolutions Plan (.msp1)|*.msp1|All files (*.*)|*.*";
+            $"MergeSolutions Plan ({MergePlanExtension})|*{MergePlanExtension}|All files (*.*)|*.*";
 
         public const string SolutionFilter =
             "Visual Studio Solution (.sln)|*.sln|All files (*.*)|*.*";
@@ -22,7 +24,7 @@ namespace MergeSolutions.UI
 
         private readonly ISolutionService _solutionService;
 
-        private MergePlan _mergePlan = new MergePlan();
+        private MergePlan _mergePlan = new();
 
         public MainForm(IMergeSolutionsService mergeSolutionsService, ISolutionService solutionService, IStartup startup,
             IMigrator migrator)
@@ -46,7 +48,7 @@ namespace MergeSolutions.UI
                 {
                     Filter = SolutionFilter,
                     FilterIndex = 1,
-                    RestoreDirectory = true
+                    InitialDirectory = _mergePlan.RootDir
                 };
 
                 if (openFileDialog.ShowDialog() == DialogResult.OK)
@@ -54,39 +56,9 @@ namespace MergeSolutions.UI
                     var stream = openFileDialog.OpenFile();
                     using (stream)
                     {
-                        var relativePath = Path.GetRelativePath(Environment.CurrentDirectory, openFileDialog.FileName);
-                        var solutionInfo = _solutionService.ParseSolution(relativePath, Environment.CurrentDirectory);
-                        _mergePlan.Solutions.RemoveAll(s => s.RelativePath == relativePath);
-                        _mergePlan.Solutions.Add(new SolutionEntity
-                        {
-                            RelativePath = relativePath,
-                            NodeName = solutionInfo.Name,
-                            Collapsed = false
-                        });
-
+                        _mergePlan.AddSolution(openFileDialog.FileName, _solutionService);
                         PlanToUi();
                     }
-                }
-            });
-        }
-
-        private void buttonBrowseOutputSolutionPath_Click(object sender, EventArgs e)
-        {
-            InTryCatch(() =>
-            {
-                UiToPlan();
-                using var saveFileDialog = new SaveFileDialog
-                {
-                    Filter = SolutionFilter,
-                    FilterIndex = 1,
-                    FileName = _mergePlan.PlanName,
-                    RestoreDirectory = true
-                };
-
-                if (saveFileDialog.ShowDialog() == DialogResult.OK)
-                {
-                    _mergePlan.OutputSolutionPath = saveFileDialog.FileName;
-                    PlanToUi();
                 }
             });
         }
@@ -99,7 +71,7 @@ namespace MergeSolutions.UI
                 {
                     Filter = MergeSolutionsPlanFilter,
                     FilterIndex = 1,
-                    RestoreDirectory = true
+                    InitialDirectory = _mergePlan.RootDir,
                 };
 
                 if (openFileDialog.ShowDialog() == DialogResult.OK)
@@ -123,10 +95,29 @@ namespace MergeSolutions.UI
         {
             InTryCatch(() =>
             {
-                UiToPlan();
-                _mergeSolutionsService.MergeSolutions(_mergePlan);
-                PlanToUi();
-                MessageBox.Show("Merged solution is created.", AppName, MessageBoxButtons.OK, MessageBoxIcon.Information);
+                if (_mergePlan.RootDir == null)
+                {
+                    throw new InvalidOperationException(
+                        "No root directory known. Please save merge plan first to resolve relative paths.");
+                }
+
+                using var saveFileDialog = new SaveFileDialog
+                {
+                    Filter = SolutionFilter,
+                    FilterIndex = 1,
+                    FileName = _mergePlan.OutputSolutionPath,
+                    InitialDirectory = _mergePlan.RootDir,
+                };
+
+                if (saveFileDialog.ShowDialog() == DialogResult.OK)
+                {
+                    UiToPlan();
+                    _mergePlan.OutputSolutionPath = saveFileDialog.FileName;
+                    _mergePlan.SaveMergePlanFile();
+                    _mergeSolutionsService.MergeSolutions(_mergePlan);
+                    PlanToUi();
+                    MessageBox.Show("Merged solution is created.", AppName, MessageBoxButtons.OK, MessageBoxIcon.Information);
+                }
             });
         }
 
@@ -139,9 +130,8 @@ namespace MergeSolutions.UI
                 {
                     Filter = MergeSolutionsPlanFilter,
                     FilterIndex = 1,
-                    FileName = _mergePlan.PlanName,
+                    FileName = $"{Path.GetFileNameWithoutExtension(_mergePlan.PlanName)}{MergePlanExtension}",
                     InitialDirectory = _mergePlan.RootDir,
-                    RestoreDirectory = true
                 };
 
                 if (saveFileDialog.ShowDialog() == DialogResult.OK)
@@ -185,7 +175,10 @@ namespace MergeSolutions.UI
         private void PlanToUi()
         {
             Text = $"{AppName} : {_mergePlan.PlanName}";
-            textBoxOutputSolutionPath.Text = _mergePlan.OutputSolutionPath;
+            labelMergedSolutionPath.Text = _mergePlan.OutputSolutionPath;
+            labelMergePlanPath.Text = _mergePlan.RootDir == null || _mergePlan.PlanName == null
+                ? ""
+                : $"Root dir: {_mergePlan.RootDir}";
             try
             {
                 treeViewSolutions.BeginUpdate();
@@ -210,14 +203,14 @@ namespace MergeSolutions.UI
                         Items =
                         {
                             {
-                                "Rename", null, (sender, args) =>
+                                "Rename", null, (_, _) =>
                                 {
                                     treeViewSolutions.LabelEdit = true;
                                     solutionTreeNode.Text = solutionTreeNode.SolutionEntity.NodeName;
                                     solutionTreeNode.BeginEdit();
                                 }
                             },
-                            {"Delete", null, (sender, args) => { treeViewSolutions.Nodes.Remove(solutionTreeNode); }}
+                            {"Delete", null, (_, _) => { treeViewSolutions.Nodes.Remove(solutionTreeNode); }}
                         }
                     };
 
@@ -265,7 +258,6 @@ namespace MergeSolutions.UI
 
         private void UiToPlan()
         {
-            _mergePlan.OutputSolutionPath = textBoxOutputSolutionPath.Text;
             var excludedProjects = new List<KeyValuePair<string, string>>();
             foreach (SolutionTreeNode solutionTreeNode in treeViewSolutions.Nodes)
             {
