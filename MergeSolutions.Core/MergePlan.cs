@@ -26,8 +26,12 @@ namespace MergeSolutions.Core
                 }
 
                 var directoryName = Path.GetDirectoryName(_outputSolutionPath ?? "");
+                if (directoryName != null)
+                {
+                    fileNameWithoutExtension = Path.Combine(directoryName, fileNameWithoutExtension);
+                }
 
-                return $"{Path.Combine(directoryName!, fileNameWithoutExtension)}.sln";
+                return $"{fileNameWithoutExtension}.sln";
             }
             set => _outputSolutionPath = value;
         }
@@ -110,10 +114,10 @@ namespace MergeSolutions.Core
                     p.Value);
             }).ToArray();
 
-            if (OutputSolutionPath != null)
+            if (OutputSolutionPath != null && RootDir != null)
             {
                 OutputSolutionPath = Path.GetRelativePath(rootDir,
-                    Path.Combine(RootDir ?? Environment.CurrentDirectory, OutputSolutionPath));
+                    Path.Combine(RootDir, OutputSolutionPath));
             }
 
             RootDir = rootDir;
