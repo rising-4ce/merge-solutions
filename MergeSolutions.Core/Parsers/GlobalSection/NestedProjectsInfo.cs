@@ -1,7 +1,7 @@
 ﻿using System.Text.RegularExpressions;
 using MergeSolutions.Core.Models;
 
-namespace MergeSolutions.Core.Parsers
+namespace MergeSolutions.Core.Parsers.GlobalSection
 {
     public class NestedProjectsInfo
     {

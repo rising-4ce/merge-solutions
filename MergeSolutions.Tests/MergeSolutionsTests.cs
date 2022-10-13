@@ -19,15 +19,22 @@ namespace MergeSolutions.Tests
 
             var outputSolutionPath = Path.Combine(outDir, outSolutionName);
 
-            var mergedSolution = SolutionInfo.MergeSolutions(Path.GetFileNameWithoutExtension(outputSolutionPath),
-                Path.GetDirectoryName(outputSolutionPath) ?? "",
-                out _,
-                null,
-                solutionPaths.Select(n => SolutionInfo.Parse(n)).ToArray());
-            mergedSolution.Save();
+            var contents = new List<string>();
+            for (int i = 0; i < 2; i++)
+            {
+                var mergedSolution = SolutionInfo.MergeSolutions(Path.GetFileNameWithoutExtension(outputSolutionPath),
+                    Path.GetDirectoryName(outputSolutionPath) ?? "",
+                    out _,
+                    null,
+                    solutionPaths.Select(n => SolutionInfo.Parse(n)).ToArray());
+                mergedSolution.Save();
+                contents.Add(File.ReadAllText(outputSolutionPath));
+            }
+
+            //Require idempotence
+            contents[1].Should().Be(contents[0]);
 
             var solutionInfo = SolutionInfo.Parse(outputSolutionPath);
-
             solutionInfo.Projects.Should().HaveCount(6);
             solutionInfo.NestedSection.Dirs.Should().HaveCount(2);
             solutionInfo.NestedSection.Dirs.Should()
@@ -75,12 +82,20 @@ namespace MergeSolutions.Tests
             var solutionPaths = new[] {"TestData/SolutionA/SolutionA.sln", "TestData/SolutionB/SolutionB.sln"};
 
             var outputSolutionPath = Path.Combine(outDir, outSolutionName);
-            var mergedSolution = SolutionInfo.MergeSolutions(Path.GetFileNameWithoutExtension(outputSolutionPath),
-                Path.GetDirectoryName(outputSolutionPath) ?? "",
-                out _,
-                null,
-                solutionPaths.Select(n => SolutionInfo.Parse(n)).ToArray());
-            mergedSolution.Save();
+            var contents = new List<string>();
+            for (int i = 0; i < 2; i++)
+            {
+                var mergedSolution = SolutionInfo.MergeSolutions(Path.GetFileNameWithoutExtension(outputSolutionPath),
+                    Path.GetDirectoryName(outputSolutionPath) ?? "",
+                    out _,
+                    null,
+                    solutionPaths.Select(n => SolutionInfo.Parse(n)).ToArray());
+                mergedSolution.Save();
+                contents.Add(File.ReadAllText(outputSolutionPath));
+            }
+
+            //Require idempotence
+            contents[1].Should().Be(contents[0]);
 
             var solutionInfo = SolutionInfo.Parse(outputSolutionPath);
 
@@ -137,8 +152,9 @@ namespace MergeSolutions.Tests
         public void NestedProjectsParsing()
         {
             var solutionInfo = SolutionInfo.Parse("TestData/SolutionA/SolutionA.sln");
-            solutionInfo.NestedSection.Dirs.Should().HaveCount(1);
+            solutionInfo.NestedSection.Dirs.Should().HaveCount(2);
             solutionInfo.NestedSection.Dirs[0].Guid.Should().Be("{8FE39D73-9DBF-47A0-94E3-24F96625B4EA}");
+            solutionInfo.NestedSection.Dirs[1].Guid.Should().Be("{6AFAC7DD-F27B-4FF5-82AF-4269B15CFFDF}");
             solutionInfo.NestedSection.Dirs[0].NestedProjects.Should().HaveCount(2);
             solutionInfo.NestedSection.Dirs[0].NestedProjects.Should()
                 .Contain(p => p.Project.Guid == "{177D7443-2536-4B05-8CBD-5FAD3CE75FD3}");

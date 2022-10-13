@@ -1,4 +1,5 @@
 ﻿using MergeSolutions.Core.Parsers;
+using MergeSolutions.Core.Parsers.GlobalSection;
 
 namespace MergeSolutions.Core.Models
 {
@@ -16,20 +17,10 @@ namespace MergeSolutions.Core.Models
 
         public static void GenerateProjectDirs(NestedProjectsInfo nestedSection, List<BaseProject> projects)
         {
-            //Func<BaseProject, string?> getActualSolutionName = p =>
-            //    p is ProjectDirectory ||
-            //    p.Location.IsWebSiteUrl() ||
-            //    (p.SolutionDir != null &&
-            //     p.Location.StartsWith(p
-            //         .SolutionDir)) //Means it is a project that is located inside solution base folder or a project directory or its a website
-            //        ? p.SolutionName
-            //        : PathHelpers.GetDirName(Path.GetDirectoryName(Path.GetDirectoryName(p.Location)) ?? "");
-
-            Func<BaseProject, string?> getActualSolutionName = p => p.SolutionName;
-            var groupedSolutions = projects.GroupBy(getActualSolutionName).Where(g => g.Key != null);
+            var groupedSolutions = projects.GroupBy(p => p.ProjectInfo.SolutionInfo).Where(g => g.Key != null);
             foreach (var group in groupedSolutions)
             {
-                var root = new ProjectDirectory(group.Key ?? "");
+                var root = new ProjectDirectory(group.Key?.Name ?? "", group.Key?.ExtensibilityGlobalsSection.SolutionGuid);
                 projects.Add(root);
 
                 root.NestedProjectsInfo = nestedSection;

@@ -1,4 +1,5 @@
 ﻿using MergeSolutions.Core.Models;
+using MergeSolutions.Core.Parsers.GlobalSection;
 using MergeSolutions.Core.Utils;
 
 namespace MergeSolutions.Core.Parsers
@@ -13,9 +14,12 @@ namespace MergeSolutions.Core.Parsers
             NestedSection = new NestedProjectsInfo();
             SolutionPlatformsSection = new SolutionConfigurationPlatformsInfo();
             ProjectPlatformsSection = new ProjectConfigurationPlatformsInfo();
+            ExtensibilityGlobalsSection = new ExtensibilityGlobalsInfo();
         }
 
         public string BaseDir { get; }
+
+        public ExtensibilityGlobalsInfo ExtensibilityGlobalsSection { get; private set; }
 
         public string Name { get; }
 
@@ -27,7 +31,7 @@ namespace MergeSolutions.Core.Parsers
 
         public SolutionPropertiesInfo PropsSection { get; }
 
-        public string RelativePath { get; set; }
+        public string? RelativePath { get; set; }
 
         public SolutionConfigurationPlatformsInfo SolutionPlatformsSection { get; private set; }
 
@@ -98,6 +102,7 @@ namespace MergeSolutions.Core.Parsers
             sln.NestedSection = NestedProjectsInfo.Parse(sln.Projects, slnText);
             sln.SolutionPlatformsSection = SolutionConfigurationPlatformsInfo.Parse(slnText);
             sln.ProjectPlatformsSection = ProjectConfigurationPlatformsInfo.Parse(slnText);
+            sln.ExtensibilityGlobalsSection = ExtensibilityGlobalsInfo.Parse(slnText);
             sln.RelativePath = Path.GetRelativePath(rootDir, slnPath);
 
             return sln;

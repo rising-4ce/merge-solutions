@@ -1,4 +1,5 @@
 ﻿using MergeSolutions.Core.Parsers;
+using MergeSolutions.Core.Parsers.GlobalSection;
 
 namespace MergeSolutions.Core.Models
 {
@@ -8,7 +9,7 @@ namespace MergeSolutions.Core.Models
 
         public ProjectDirectory(string name, string? guid = null, string? packageGuid = null, string? all = null,
             SolutionInfo? solutionInfo = null)
-            : base(guid ?? "{" + System.Guid.NewGuid().ToString().ToUpper() + "}",
+            : base(guid ?? "{" + GenerateGuid() + "}",
                 name,
                 new ProjectInfo(solutionInfo, packageGuid ?? DirPackageGuid, all ?? Environment.NewLine))
         {
@@ -24,5 +25,10 @@ namespace MergeSolutions.Core.Models
         public NestedProjectsInfo? NestedProjectsInfo { get; set; }
 
         public string? OverridingName { get; set; }
+
+        private static string GenerateGuid()
+        {
+            return System.Guid.NewGuid().ToString().ToUpper();
+        }
     }
 }
