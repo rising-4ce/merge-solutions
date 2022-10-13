@@ -17,8 +17,6 @@ namespace MergeSolutions.Core.Models
 
         public string Guid { get; }
 
-        public virtual bool IsEmpty => false;
-
         public abstract string Location { get; }
 
         public virtual string Name { get; }

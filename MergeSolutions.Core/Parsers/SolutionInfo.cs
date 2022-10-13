@@ -43,7 +43,6 @@ namespace MergeSolutions.Core.Parsers
 
             var allProjects = solutions
                 .SelectMany(s => s.Projects)
-                .Where(p => !p.IsEmpty)
                 .Where(projectFilter ?? (_ => true))
                 .Distinct(BaseProject.ProjectGuidLocationComparer)
                 .ToList();
@@ -55,7 +54,8 @@ namespace MergeSolutions.Core.Parsers
 
             warnings = SolutionDiagnostics.DiagnoseDupeGuids(solutions);
 
-            FixSolutionItems(allProjects);
+            RenameSolutionItemsDirectoryProjects(allProjects);
+            CleanupEmptyDirectoryProjects(allProjects);
 
             var mergedSln = new SolutionInfo(newName, baseDir, solutions[0].PropsSection)
             {
@@ -125,7 +125,35 @@ EndGlobal
 ";
         }
 
-        private static void FixSolutionItems(List<BaseProject> allProjects)
+        private static void CleanupEmptyDirectoryProjects(List<BaseProject> allProjects)
+        {
+            bool hasRemoved;
+            do
+            {
+                hasRemoved = false;
+                var emptyDirectoryProjects = allProjects.OfType<ProjectDirectory>()
+                    .Where(p => p.NestedProjects.Count == 0 && p.ProjectInfo.All == Environment.NewLine).ToArray();
+                foreach (var emptyDirectoryProject in emptyDirectoryProjects)
+                {
+                    allProjects.Remove(emptyDirectoryProject);
+                    hasRemoved = true;
+                }
+
+                foreach (var projectDirectory in allProjects.OfType<ProjectDirectory>())
+                {
+                    foreach (var projectRelationInfo in projectDirectory.NestedProjects.ToArray())
+                    {
+                        if (!allProjects.Contains(projectRelationInfo.Project))
+                        {
+                            projectDirectory.NestedProjects.Remove(projectRelationInfo);
+                            hasRemoved = true;
+                        }
+                    }
+                }
+            } while (hasRemoved);
+        }
+
+        private static void RenameSolutionItemsDirectoryProjects(List<BaseProject> allProjects)
         {
             foreach (var projectDirectory in allProjects.OfType<ProjectDirectory>())
             {

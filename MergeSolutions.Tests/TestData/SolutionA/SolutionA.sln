@@ -16,6 +16,10 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution 
 		1.txt = 1.txt
 	EndProjectSection
 EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "OuterEmptyFolder", "OuterEmptyFolder", "{6AFAC7DD-F27B-4FF5-82AF-4269B15CFFDF}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "InnerEmptyFolder", "InnerEmptyFolder", "{B0A2241D-1ADD-428B-BA3A-1FFE36DAB525}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -41,6 +45,7 @@ Global
 	GlobalSection(NestedProjects) = preSolution
 		{177D7443-2536-4B05-8CBD-5FAD3CE75FD3} = {8FE39D73-9DBF-47A0-94E3-24F96625B4EA}
 		{2DA8C987-D5E9-4756-930E-1EBE4AC8D0AD} = {8FE39D73-9DBF-47A0-94E3-24F96625B4EA}
+		{B0A2241D-1ADD-428B-BA3A-1FFE36DAB525} = {6AFAC7DD-F27B-4FF5-82AF-4269B15CFFDF}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {CAE28B69-4C6B-4930-95FE-1053358566FF}
