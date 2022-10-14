@@ -20,7 +20,8 @@ Merges Visual Studio solutions into a single .sln file
   - Empty solution folders are excluded.
   - Handle a special folder Solution Items and move into per-solution subfolders as Inner Solution Items
   - Merge platforms and project configuration sections
-  - Handle guid of merged solution 
+  - Handle guid of merged solution
+- Ui application opens a merge plan path provided as the first command line argument to support "Open with..." interation with OS. 
 
 # Command line tool usage
 ```
