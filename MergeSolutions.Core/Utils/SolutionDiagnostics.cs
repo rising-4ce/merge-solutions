@@ -8,7 +8,7 @@ namespace MergeSolutions.Core.Utils
     {
         public static string DiagnoseDupeGuids(IEnumerable<SolutionInfo> solutions, Func<BaseProject, bool>? projectFilter = null)
         {
-            var weirdProjects = GetProjectGuidDuplicates(solutions);
+            var weirdProjects = GetProjectGuidDuplicates(solutions, projectFilter);
             if (weirdProjects.Length == 0)
             {
                 return "";
