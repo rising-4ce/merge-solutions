@@ -52,7 +52,7 @@ namespace MergeSolutions.Core.Parsers
                 .Distinct(BaseProject.ProjectGuidLocationComparer)
                 .ToList();
 
-            warnings = SolutionDiagnostics.DiagnoseDupeGuids(solutions);
+            warnings = SolutionDiagnostics.DiagnoseDupeGuids(solutions, projectFilter);
 
             RenameSolutionItemsDirectoryProjects(allProjects);
             CleanupEmptyDirectoryProjects(allProjects);

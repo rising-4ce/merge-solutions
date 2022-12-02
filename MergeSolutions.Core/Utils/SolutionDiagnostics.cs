@@ -6,7 +6,7 @@ namespace MergeSolutions.Core.Utils
 {
     public static class SolutionDiagnostics
     {
-        public static string DiagnoseDupeGuids(IEnumerable<SolutionInfo> solutions)
+        public static string DiagnoseDupeGuids(IEnumerable<SolutionInfo> solutions, Func<BaseProject, bool>? projectFilter = null)
         {
             var weirdProjects = GetProjectGuidDuplicates(solutions);
             if (weirdProjects.Length == 0)
@@ -43,9 +43,11 @@ namespace MergeSolutions.Core.Utils
             return report.ToString();
         }
 
-        public static IGrouping<string, BaseProject>[] GetProjectGuidDuplicates(IEnumerable<SolutionInfo> solutions)
+        public static IGrouping<string, BaseProject>[] GetProjectGuidDuplicates(IEnumerable<SolutionInfo> solutions,
+            Func<BaseProject, bool>? projectFilter = null)
         {
             return solutions.SelectMany(s => s.Projects)
+                .Where(projectFilter ?? (_ => true))
                 .Distinct(BaseProject.ProjectGuidLocationComparer)
                 .GroupBy(p => p.Guid)
                 .Where(gr => gr.Count() > 1)
