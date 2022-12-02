@@ -113,7 +113,6 @@ namespace MergeSolutions.UI
                 {
                     UiToPlan();
                     _mergePlan.OutputSolutionPath = saveFileDialog.FileName;
-                    _mergePlan.SaveMergePlanFile();
                     _mergeSolutionsService.MergeSolutions(_mergePlan);
                     PlanToUi();
                     MessageBox.Show("Merged solution is created.", AppName, MessageBoxButtons.OK, MessageBoxIcon.Information);
