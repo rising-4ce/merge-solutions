@@ -69,11 +69,17 @@ namespace MergeSolutions.Core.Parsers
             };
 
             var lines = allProjects.Where(p => p.ProjectInfo.SolutionInfo != null)
-                .SelectMany(p => p.ProjectInfo.SolutionInfo!.SolutionPlatformsSection.Lines).Distinct().ToArray();
+                .SelectMany(p => p.ProjectInfo.SolutionInfo!.SolutionPlatformsSection.Lines)
+                .Distinct()
+                .OrderBy(l => l.Key)
+                .ThenBy(l => l.Value)
+                .ToArray();
             mergedSln.SolutionPlatformsSection = new SolutionConfigurationPlatformsInfo(lines);
 
             lines = allProjects.Where(p => p.ProjectInfo.SolutionInfo != null)
-                .SelectMany(p => p.ProjectInfo.SolutionInfo!.ProjectPlatformsSection.Lines).Distinct().ToArray();
+                .SelectMany(p => p.ProjectInfo.SolutionInfo!.ProjectPlatformsSection.Lines)
+                .Distinct()
+                .ToArray();
             mergedSln.ProjectPlatformsSection = new ProjectConfigurationPlatformsInfo(lines);
 
             mergedSln.CreateNestedDirs()
