@@ -192,10 +192,7 @@ namespace MergeSolutions.UI
 
                     var solutionInfo = _solutionService.ParseSolution(solutionEntity.RelativePath, _mergePlan.RootDir);
                     solutionEntity.NodeName ??= solutionInfo.Name;
-                    var solutionTreeNode = new SolutionTreeNode(solutionEntity)
-                    {
-                        Checked = true
-                    };
+                    var solutionTreeNode = new SolutionTreeNode(solutionEntity);
 
                     solutionTreeNode.ContextMenuStrip = new ContextMenuStrip()
                     {
@@ -219,6 +216,7 @@ namespace MergeSolutions.UI
                         }
                     };
 
+                    var hasChecked = false;
                     foreach (var project in solutionInfo.Projects.OfType<Project>().OrderBy(p => p.Name))
                     {
                         var projectNode = new TreeNode(project.Name)
@@ -228,7 +226,10 @@ namespace MergeSolutions.UI
                         };
 
                         solutionTreeNode.Nodes.Add(projectNode);
+                        hasChecked |= projectNode.Checked;
                     }
+
+                    solutionTreeNode.Checked = hasChecked;
 
                     treeViewSolutions.Nodes.Add(solutionTreeNode);
                     if (!solutionEntity.Collapsed)

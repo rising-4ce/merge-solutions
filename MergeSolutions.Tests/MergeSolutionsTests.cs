@@ -8,6 +8,38 @@ namespace MergeSolutions.Tests
     public class MergeSolutionsTests
     {
         [Fact]
+        // ReSharper disable once InconsistentNaming
+        public void ExcludeSolutionsWithNoNonDirProjectsSelected()
+        {
+            var outDir = Path.Combine(Path.GetTempPath(), nameof(MergeSolutionsTests));
+            RecursiveDelete(new DirectoryInfo(outDir));
+            Directory.CreateDirectory(outDir);
+            var outSolutionName = "out.sln";
+
+            var solutionPaths = new[] {"TestData/SolutionA/SolutionA.sln", "TestData/SolutionB/SolutionB.sln"};
+
+            var outputSolutionPath = Path.Combine(outDir, outSolutionName);
+            var contents = new List<string>();
+            for (var i = 0; i < 2; i++)
+            {
+                var mergedSolution = SolutionInfo.MergeSolutions(Path.GetFileNameWithoutExtension(outputSolutionPath),
+                    Path.GetDirectoryName(outputSolutionPath) ?? "",
+                    out _,
+                    p => !(p is Project && p.ProjectInfo.SolutionInfo?.Name == "SolutionB"),
+                    solutionPaths.Select(n => SolutionInfo.Parse(n)).ToArray());
+                mergedSolution.Save();
+                contents.Add(File.ReadAllText(outputSolutionPath));
+            }
+
+            //Require idempotence
+            contents[1].Should().Be(contents[0]);
+
+            var solutionInfo = SolutionInfo.Parse(outputSolutionPath);
+            solutionInfo.NestedSection.Dirs.Should().ContainSingle(d => d.Name == "SolutionA");
+            solutionInfo.NestedSection.Dirs.Should().NotContain(d => d.Name == "SolutionB");
+        }
+
+        [Fact]
         public void MergeOfSingleA()
         {
             var outDir = Path.Combine(Path.GetTempPath(), nameof(MergeSolutionsTests));
@@ -20,7 +52,7 @@ namespace MergeSolutions.Tests
             var outputSolutionPath = Path.Combine(outDir, outSolutionName);
 
             var contents = new List<string>();
-            for (int i = 0; i < 2; i++)
+            for (var i = 0; i < 2; i++)
             {
                 var mergedSolution = SolutionInfo.MergeSolutions(Path.GetFileNameWithoutExtension(outputSolutionPath),
                     Path.GetDirectoryName(outputSolutionPath) ?? "",
@@ -84,7 +116,7 @@ namespace MergeSolutions.Tests
 
             var outputSolutionPath = Path.Combine(outDir, outSolutionName);
             var contents = new List<string>();
-            for (int i = 0; i < 2; i++)
+            for (var i = 0; i < 2; i++)
             {
                 var mergedSolution = SolutionInfo.MergeSolutions(Path.GetFileNameWithoutExtension(outputSolutionPath),
                     Path.GetDirectoryName(outputSolutionPath) ?? "",

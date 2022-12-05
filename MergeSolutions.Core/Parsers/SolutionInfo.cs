@@ -56,6 +56,7 @@ namespace MergeSolutions.Core.Parsers
 
             RenameSolutionItemsDirectoryProjects(allProjects);
             CleanupEmptyDirectoryProjects(allProjects);
+            CleanupSolutionsWithOnlyDirectoryProjects(allProjects);
 
             if (allProjects.Count == 0)
             {
@@ -179,6 +180,14 @@ EndGlobal
                     }
                 }
             } while (hasRemoved);
+        }
+
+        private static void CleanupSolutionsWithOnlyDirectoryProjects(List<BaseProject> allProjects)
+        {
+            var emptySolutions = allProjects.GroupBy(p => p.ProjectInfo.SolutionInfo)
+                .Where(g => g.All(b => b is ProjectDirectory))
+                .Select(g => g.Key);
+            allProjects.RemoveAll(p => emptySolutions.Contains(p.ProjectInfo.SolutionInfo));
         }
 
         private static void RenameSolutionItemsDirectoryProjects(List<BaseProject> allProjects)
