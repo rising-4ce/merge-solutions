@@ -39,7 +39,8 @@ namespace MergeSolutions.Core.Parsers
         public string? Text { get; private init; }
 
         public static SolutionInfo MergeSolutions(string newName, string baseDir, out string warnings,
-            Func<BaseProject, bool>? projectFilter, params SolutionInfo[] solutions)
+            Func<BaseProject, bool>? projectFilter, Dictionary<string, string[]>? configurationFallback,
+            params SolutionInfo[] solutions)
         {
             if (solutions.Length == 0)
             {
@@ -86,6 +87,7 @@ namespace MergeSolutions.Core.Parsers
                 .Projects.ForEach(pr => pr.ProjectInfo.SolutionInfo = mergedSln);
 
             AssignRootLevelDirectoriesDependentSolutionGuid(mergedSln);
+            ApplyConfigurationFallback(mergedSln, configurationFallback);
 
             return mergedSln;
         }
@@ -139,6 +141,18 @@ Global
 {ExtensibilityGlobalsSection}
 EndGlobal
 ";
+        }
+
+        private static void ApplyConfigurationFallback(SolutionInfo solutionInfo,
+            Dictionary<string, string[]>? configurationFallback)
+        {
+            if (configurationFallback == null)
+            {
+                return;
+            }
+
+            var platformInfoLines = solutionInfo.ProjectPlatformsSection.PlatformInfoLines;
+            var projects = solutionInfo.Projects.OfType<Project>().ToArray();
         }
 
         private static void AssignRootLevelDirectoriesDependentSolutionGuid(SolutionInfo mergedSolution)

@@ -26,6 +26,7 @@ namespace MergeSolutions.Tests
                     Path.GetDirectoryName(outputSolutionPath) ?? "",
                     out _,
                     p => !(p is Project && p.ProjectInfo.SolutionInfo?.Name == "SolutionB"),
+                    null,
                     solutionPaths.Select(n => SolutionInfo.Parse(n)).ToArray());
                 mergedSolution.Save();
                 contents.Add(File.ReadAllText(outputSolutionPath));
@@ -57,6 +58,7 @@ namespace MergeSolutions.Tests
                 var mergedSolution = SolutionInfo.MergeSolutions(Path.GetFileNameWithoutExtension(outputSolutionPath),
                     Path.GetDirectoryName(outputSolutionPath) ?? "",
                     out _,
+                    null,
                     null,
                     solutionPaths.Select(n => SolutionInfo.Parse(n)).ToArray());
                 mergedSolution.Save();
@@ -121,6 +123,7 @@ namespace MergeSolutions.Tests
                 var mergedSolution = SolutionInfo.MergeSolutions(Path.GetFileNameWithoutExtension(outputSolutionPath),
                     Path.GetDirectoryName(outputSolutionPath) ?? "",
                     out _,
+                    null,
                     null,
                     solutionPaths.Select(n => SolutionInfo.Parse(n)).ToArray());
                 mergedSolution.Save();
@@ -220,6 +223,7 @@ namespace MergeSolutions.Tests
 
                     return true;
                 },
+                null,
                 solutionPaths.Select(n => SolutionInfo.Parse(n)).ToArray());
             mergedSolution.Save();
 
@@ -241,6 +245,7 @@ namespace MergeSolutions.Tests
 
                     return true;
                 },
+                null,
                 solutionPaths.Select(n => SolutionInfo.Parse(n)).ToArray());
             mergedSolution.Save();
 

@@ -11,11 +11,17 @@ namespace MergeSolutions.Core.Services
                 .Select(s => SolutionInfo.Parse(s.RelativePath!, mergePlan.RootDir, s.NodeName))
                 .ToArray();
 
+            if (mergePlan.OutputSolutionPath == null)
+            {
+                throw new InvalidOperationException($"Merge plan does not contain {nameof(mergePlan.OutputSolutionPath)}");
+            }
+
             var outputSlnPath = Path.Combine(mergePlan.RootDir!, mergePlan.OutputSolutionPath);
             var mergedSolution = SolutionInfo.MergeSolutions(Path.GetFileNameWithoutExtension(outputSlnPath),
                 Path.GetDirectoryName(outputSlnPath) ?? "",
                 out var warnings,
                 project => !mergePlan.IsExcluded(project),
+                mergePlan.ConfigurationFallback,
                 solutions);
 
             if (!string.IsNullOrWhiteSpace(warnings))

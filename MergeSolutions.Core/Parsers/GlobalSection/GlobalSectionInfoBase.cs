@@ -39,7 +39,7 @@ namespace MergeSolutions.Core.Parsers.GlobalSection
 
         internal virtual TGlobalSectionInfo InternalParse(string slnText)
         {
-            var solutionConfigurationPlatformsInfo = new TGlobalSectionInfo();
+            var globalSectionInfo = new TGlobalSectionInfo();
             var matchCollection1 = _reProjectConfigurationPlatformsSection.Matches(slnText);
             if (matchCollection1.Count == 1)
             {
@@ -49,11 +49,11 @@ namespace MergeSolutions.Core.Parsers.GlobalSection
                 {
                     var left = match.Groups["Left"].Value;
                     var right = match.Groups["Right"].Value;
-                    solutionConfigurationPlatformsInfo.Lines.Add(new KeyValuePair<string, string>(left, right));
+                    globalSectionInfo.Lines.Add(new KeyValuePair<string, string>(left, right));
                 }
             }
 
-            return solutionConfigurationPlatformsInfo;
+            return globalSectionInfo;
         }
     }
 }

@@ -10,6 +10,8 @@ namespace MergeSolutions.Core
     {
         private string? _outputSolutionPath;
 
+        public Dictionary<string, string[]>? ConfigurationFallback { get; set; }
+
         /// <summary>
         /// Excluded projects. Key is solution name, value is a project GUID
         /// </summary>
