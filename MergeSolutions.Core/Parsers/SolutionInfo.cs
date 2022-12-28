@@ -58,6 +58,7 @@ namespace MergeSolutions.Core.Parsers
             RenameSolutionItemsDirectoryProjects(allProjects);
             CleanupEmptyDirectoryProjects(allProjects);
             CleanupSolutionsWithOnlyDirectoryProjects(allProjects);
+            NormalizeSolutionPlatformsCase(allProjects);
 
             if (allProjects.Count == 0)
             {
@@ -146,13 +147,68 @@ EndGlobal
         private static void ApplyConfigurationFallback(SolutionInfo solutionInfo,
             Dictionary<string, string[]>? configurationFallback)
         {
-            if (configurationFallback == null)
+            var solutionPlatformsSection = solutionInfo.SolutionPlatformsSection;
+            var projects = solutionInfo.Projects.OfType<Project>().ToArray();
+            var existingProjectPlatformSections =
+                new List<(Project Project, KeyValuePair<string, string> SolutionPlatformsSectionLine,
+                    ProjectConfigurationPlatformsInfo.PlatformInfoLine[] PlatformInfoLines)>();
+            var missingProjectPlatformSections =
+                new List<(Project Project, KeyValuePair<string, string> SolutionPlatformsSectionLine,
+                    ProjectConfigurationPlatformsInfo.PlatformInfoLine[] PlatformInfoLines)>();
+            foreach (var project in projects)
             {
-                return;
+                var platformInfoLines = solutionInfo.ProjectPlatformsSection.PlatformInfoLines.Where(pl =>
+                    pl.ProjectGuid == project.Guid).ToArray();
+                foreach (var solutionPlatformsSectionLine in solutionPlatformsSection.Lines)
+                {
+                    var platformInfoLines2 = platformInfoLines.Where(pl =>
+                        pl.SolutionPlatformKey == solutionPlatformsSectionLine.Key).ToArray();
+                    if (platformInfoLines2.Any())
+                    {
+                        existingProjectPlatformSections.Add((project, solutionPlatformsSectionLine, platformInfoLines2));
+                    }
+                    else
+                    {
+                        missingProjectPlatformSections.Add((project, solutionPlatformsSectionLine, platformInfoLines));
+                    }
+                }
             }
 
-            var platformInfoLines = solutionInfo.ProjectPlatformsSection.PlatformInfoLines;
-            var projects = solutionInfo.Projects.OfType<Project>().ToArray();
+            var autoConfigurationFallbackRev = existingProjectPlatformSections.GroupBy(
+                s => s.PlatformInfoLines.First().SolutionPlatformKey,
+                s => s.PlatformInfoLines.First().ProjectPlatformKey).ToDictionary(
+                g => g.Key,
+                g => g.GroupBy(g2 => g2)
+                    .OrderByDescending(g2 => g2.Count())
+                    .Select(g2 => g2.Key).ToArray());
+
+            foreach (var missingProjectPlatformSection in missingProjectPlatformSections)
+            {
+                if (autoConfigurationFallbackRev.TryGetValue(missingProjectPlatformSection.SolutionPlatformsSectionLine.Key,
+                        out var projectPlatformKeys))
+                {
+                    foreach (var projectPlatformKey in projectPlatformKeys)
+                    {
+                        var proposedPlatformInfoLines = missingProjectPlatformSection.PlatformInfoLines
+                            .Where(pl => pl.ProjectPlatformKey == projectPlatformKey)
+                            .Select(pl => new ProjectConfigurationPlatformsInfo.PlatformInfoLine(pl,
+                                missingProjectPlatformSection.SolutionPlatformsSectionLine.Key)).ToArray();
+                        if (proposedPlatformInfoLines.Any())
+                        {
+                            solutionInfo.ProjectPlatformsSection.Lines.AddRange(
+                                proposedPlatformInfoLines.Select(l => l.ToLine()));
+                            break;
+                        }
+                    }
+                }
+            }
+
+            // Sort
+            var lines = solutionInfo.ProjectPlatformsSection.PlatformInfoLines;
+            var array = solutionInfo.Projects
+                .SelectMany(p => lines.Where(l => l.ProjectGuid == p.Guid).Select(l => l.ToLine()).Distinct().OrderBy(l => l.Key))
+                .ToArray();
+            solutionInfo.ProjectPlatformsSection = new ProjectConfigurationPlatformsInfo(array);
         }
 
         private static void AssignRootLevelDirectoriesDependentSolutionGuid(SolutionInfo mergedSolution)
@@ -208,6 +264,40 @@ EndGlobal
                 .Where(g => g.All(b => b is ProjectDirectory))
                 .Select(g => g.Key);
             allProjects.RemoveAll(p => emptySolutions.Contains(p.ProjectInfo.SolutionInfo));
+        }
+
+        private static void NormalizeSolutionPlatformsCase(List<BaseProject> allProjects)
+        {
+            var projects = allProjects.Where(p => p.ProjectInfo.SolutionInfo != null).ToArray();
+            var caseDiffers = projects
+                .SelectMany(p => p.ProjectInfo.SolutionInfo!.SolutionPlatformsSection.Lines)
+                .Distinct()
+                .OrderBy(l => l.Key)
+                .ThenBy(l => l.Value)
+                .ToArray().GroupBy(l => l.Key.ToUpperInvariant())
+                .Where(g => g.Count() > 1).ToArray();
+            foreach (var caseDiffer in caseDiffers)
+            {
+                var winner = caseDiffer.Last();
+                foreach (var project in projects)
+                {
+                    var lines = project.ProjectInfo.SolutionInfo!.SolutionPlatformsSection.Lines;
+                    foreach (var line in lines.ToArray())
+                    {
+                        if (caseDiffer.Any(cd => cd.Key == line.Key))
+                        {
+                            lines.Remove(line);
+                            lines.Add(winner);
+                            var replacements = project.ProjectInfo.SolutionInfo.ProjectPlatformsSection.Lines
+                                .Where(l => l.Value == line.Key).ToArray();
+                            project.ProjectInfo.SolutionInfo.ProjectPlatformsSection.Lines.RemoveAll(
+                                l => replacements.Contains(l));
+                            project.ProjectInfo.SolutionInfo.ProjectPlatformsSection.Lines.AddRange(
+                                replacements.Select(r => new KeyValuePair<string, string>(r.Key, winner.Key)));
+                        }
+                    }
+                }
+            }
         }
 
         private static void RenameSolutionItemsDirectoryProjects(List<BaseProject> allProjects)

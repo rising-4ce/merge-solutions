@@ -10,7 +10,7 @@
     <Compile Remove="TestData\SolutionA\ClassLibrary1\Class1.cs" />
     <Compile Remove="TestData\SolutionA\InDiskFolder\InDiskFolderClassLibrary\Class1.cs" />
     <Compile Remove="TestData\SolutionA\InSolutionFolderClassLibrary\Class1.cs" />
-    <Compile Remove="TestData\SolutionB\ClassLibrary1\Class1.cs" />
+    <Compile Remove="TestData\SolutionB\ClassLibrary2\Class1.cs" />
     <Compile Remove="TestData\SolutionB\InSolutionFolderClassLibraryB\Class1.cs" />
   </ItemGroup>
 
@@ -24,7 +24,7 @@
     <Content Include="TestData\SolutionA\InSolutionFolderClassLibrary\Class1.cs">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Content>
-    <Content Include="TestData\SolutionB\ClassLibrary1\Class1.cs">
+    <Content Include="TestData\SolutionB\ClassLibrary2\Class1.cs">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Content>
     <Content Include="TestData\SolutionB\InSolutionFolderClassLibraryB\Class1.cs">
@@ -45,7 +45,7 @@
   </ItemGroup>
 
   <ItemGroup>
-    <Content Include="TestData\SolutionB\ClassLibrary1\ClassLibrary1.csproj">
+    <Content Include="TestData\SolutionB\ClassLibrary2\ClassLibrary2.csproj">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Content>
   </ItemGroup>

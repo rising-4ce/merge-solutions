@@ -5,7 +5,7 @@ namespace MergeSolutions.Core.Parsers.GlobalSection
     public class ProjectConfigurationPlatformsInfo : GlobalSectionInfoBase<ProjectConfigurationPlatformsInfo>
     {
         private static readonly Regex _reKey =
-            new Regex(@"\{(.*?)\}\.(.*?)\|(.*?)\.(.*)",
+            new Regex(@"(\{.*?\})\.(.*?)\|(.*?)\.(.*)",
                 RegexOptions.Multiline | RegexOptions.Compiled);
 
         private static readonly Regex _reValue =
@@ -37,6 +37,19 @@ namespace MergeSolutions.Core.Parsers.GlobalSection
 
         public class PlatformInfoLine
         {
+            public PlatformInfoLine(PlatformInfoLine source, string overrideSolutionPlatformKey)
+                : this(source.ToLine())
+            {
+                var valueMatch = _reValue.Match(overrideSolutionPlatformKey);
+                if (!valueMatch.Success)
+                {
+                    throw new InvalidOperationException($"Invalid platform info line value {overrideSolutionPlatformKey}");
+                }
+
+                SolutionConfiguration = valueMatch.Groups[1].Value;
+                SolutionPlatform = valueMatch.Groups[2].Value;
+            }
+
             public PlatformInfoLine(KeyValuePair<string, string> line)
             {
                 var keyMatch = _reKey.Match(line.Key);
@@ -59,19 +72,26 @@ namespace MergeSolutions.Core.Parsers.GlobalSection
                 ProjectPlatform = valueMatch.Groups[2].Value;
             }
 
+            public string Key => $"{ProjectGuid}.{SolutionPlatformKey}.{Parameter}";
+
             public string? Parameter { get; set; }
             public string? ProjectConfiguration { get; set; }
 
             public string? ProjectGuid { get; set; }
             public string? ProjectPlatform { get; set; }
+
+            public string ProjectPlatformKey => $"{ProjectConfiguration}|{ProjectPlatform}";
+            
             public string? SolutionConfiguration { get; set; }
             public string? SolutionPlatform { get; set; }
+           
+            public string SolutionPlatformKey => $"{SolutionConfiguration}|{SolutionPlatform}";
+            
+            public string Value => ProjectPlatformKey;
 
             public KeyValuePair<string, string> ToLine()
             {
-                return new KeyValuePair<string, string>(
-                    $"{{{ProjectGuid}}}.{SolutionConfiguration}|{SolutionPlatform}.{Parameter}",
-                    $"{ProjectConfiguration}|{ProjectPlatform}");
+                return new KeyValuePair<string, string>(Key, Value);
             }
         }
 
