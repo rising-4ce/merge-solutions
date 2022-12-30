@@ -6,4 +6,12 @@
     <Nullable>enable</Nullable>
   </PropertyGroup>
 
+  <PropertyGroup>
+    <DisableFastUpToDateCheck>true</DisableFastUpToDateCheck>
+  </PropertyGroup>
+  <Target Name="PreBuild" BeforeTargets="PreBuildEvent" Condition="'$(Configuration)' == 'Debug'">
+    <Exec Condition=" '$(OS)' == 'Windows_NT' " Command="powershell.exe -ExecutionPolicy Bypass -NoLogo -NonInteractive -NoProfile -WindowStyle Hidden -File &quot;$(ProjectDir)..\PreBuild.ps1&quot; -Action AssemblyInfo -ProjectDir .&#xD;&#xA;&#xD;&#xA;" />
+    <!--<Exec Condition=" '$(OS)' != 'Windows_NT' " Command="pwsh -ExecutionPolicy Bypass -NoLogo -NonInteractive -NoProfile -File &quot;$(ProjectDir)..\PreBuild.ps1&quot; -Action AssemblyInfo -ProjectDir .&#xD;&#xA;&#xD;&#xA;" />-->
+  </Target>
+
 </Project>
