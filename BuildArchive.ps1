@@ -65,7 +65,7 @@ function ZipFiles( $zipfilename, $sourcedir)
   }
 }
 
-$ZipName = "$PSScriptRoot\..\$ProjectName $Version ($RevHash).zip" -replace "`n|`r"
+$ZipName = "$PSScriptRoot\..\$ProjectName $Version.zip" -replace "`n|`r"
 "$ZipName < $BuildDir"
 ZipFiles $ZipName $BuildDir
 Remove-Item "$BuildDir" -Recurse -ErrorAction SilentlyContinue
@@ -81,5 +81,5 @@ if ($CreateTag -eq "y")
         throw 'Tagging failed'
     }
 
-    git.exe push origin refs/tags/"public-$Version" --porcelain
+    git.exe push origin refs/tags/"release-$Version" --porcelain
 }
