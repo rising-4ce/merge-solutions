@@ -75,7 +75,7 @@ Write-Host "Built version: $Version"
 if ($CreateTag -eq "y")
 {
     "Tagging ..."
-    git tag "public-$Version"
+    git tag "release-$Version"
     if (-not $?)
     {
         throw 'Tagging failed'
