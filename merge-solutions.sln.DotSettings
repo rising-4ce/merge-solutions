@@ -550,5 +550,6 @@ public $propertyType$ $propertyName$&#xD;
 	<s:Boolean x:Key="/Default/PatternsAndTemplates/LiveTemplates/Template/=B3C52C661BE11D439E36E53E793F3B98/ShortenQualifiedReferences/@EntryValue">True</s:Boolean>
 	<s:String x:Key="/Default/PatternsAndTemplates/LiveTemplates/Template/=B3C52C661BE11D439E36E53E793F3B98/Text/@EntryValue">public DelegateCommand&lt;$string$&gt; $CommandName$ { get; private set; }</s:String>
 	<s:Boolean x:Key="/Default/UserDictionary/Words/=Guids/@EntryIndexedValue">True</s:Boolean>
+	<s:Boolean x:Key="/Default/UserDictionary/Words/=idempotence/@EntryIndexedValue">True</s:Boolean>
 	<s:Boolean x:Key="/Default/UserDictionary/Words/=Migrator/@EntryIndexedValue">True</s:Boolean>
 	</wpf:ResourceDictionary>

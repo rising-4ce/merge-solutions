@@ -8,13 +8,12 @@ namespace MergeSolutions.Tests
     public class MergeSolutionsTests
     {
         [Fact]
-        // ReSharper disable once InconsistentNaming
         public void ExcludeSolutionsWithNoNonDirProjectsSelected()
         {
             var outDir = Path.Combine(Path.GetTempPath(), nameof(MergeSolutionsTests));
             RecursiveDelete(new DirectoryInfo(outDir));
             Directory.CreateDirectory(outDir);
-            var outSolutionName = "out.sln";
+            const string outSolutionName = "out.sln";
 
             var solutionPaths = new[] {"TestData/SolutionA/SolutionA.sln", "TestData/SolutionB/SolutionB.sln"};
 
@@ -46,7 +45,7 @@ namespace MergeSolutions.Tests
             var outDir = Path.Combine(Path.GetTempPath(), nameof(MergeSolutionsTests));
             RecursiveDelete(new DirectoryInfo(outDir));
             Directory.CreateDirectory(outDir);
-            var outSolutionName = "out.sln";
+            const string outSolutionName = "out.sln";
 
             var solutionPaths = new[] {"TestData/SolutionA/SolutionA.sln",};
 
@@ -107,12 +106,101 @@ namespace MergeSolutions.Tests
 
         [Fact]
         // ReSharper disable once InconsistentNaming
+        public void MergeSolutionBC_ShouldNotContainDuplicateProjects()
+        {
+            var outDir = Path.Combine(Path.GetTempPath(), nameof(MergeSolutionsTests));
+            RecursiveDelete(new DirectoryInfo(outDir));
+            Directory.CreateDirectory(outDir);
+            const string outSolutionName = "out.sln";
+
+            var solutionPaths = new[] {"TestData/SolutionB/SolutionB.sln", "TestData/SolutionC/SolutionC.sln"};
+            var expectedProjectGuids = new[] {"{EADACA47-6660-4693-A6A8-6ACFF1CF6A46}", "{E77589E3-8B28-4BEC-B486-73720938DF07}"};
+            var expectedConfigurations = new[] {"Debug|Any CPU", "LocalHost|Any CPU", "Production|Any CPU", "Release|Any CPU"};
+            var expectedSolutionPlatforms = expectedConfigurations.ToDictionary(c => c, c => c);
+            var expectedProjectPlatforms = expectedProjectGuids.SelectMany(p =>
+                expectedConfigurations.SelectMany(c =>
+                    new KeyValuePair<string, string>[] {new($"{p}.{c}.Build.0", c), new($"{p}.{c}.ActiveCfg", c)})).ToArray();
+
+            var outputSolutionPath = Path.Combine(outDir, outSolutionName);
+            var contents = new List<string>();
+            for (var i = 0; i < 2; i++)
+            {
+                var mergedSolution = SolutionInfo.MergeSolutions(Path.GetFileNameWithoutExtension(outputSolutionPath),
+                    Path.GetDirectoryName(outputSolutionPath) ?? "",
+                    out _,
+                    null,
+                    null,
+                    solutionPaths.Select(n => SolutionInfo.Parse(n)).ToArray());
+                mergedSolution.Save();
+                contents.Add(File.ReadAllText(outputSolutionPath));
+            }
+
+            //Require idempotence
+            contents[1].Should().Be(contents[0]);
+
+            var solutionInfo = SolutionInfo.Parse(outputSolutionPath);
+
+            solutionInfo.Projects.Should().HaveCount(5);
+
+            solutionInfo.ExtensibilityGlobalsSection.SolutionGuid.Should().Be("{0F9B2256-FEFF-4D23-BFD6-05B98F4DBDF0}");
+
+            solutionInfo.NestedSection.Dirs
+                .Should()
+                .HaveCount(2)
+                .And
+                .ContainSingle(d => d.Guid == "{0F9B2256-FEFF-4D23-BFD6-05B98F4DBDF0}")
+                .Which.NestedProjects
+                .Should()
+                .Satisfy(p => p.Project.Guid == expectedProjectGuids[0],
+                    p => p.Project.Guid == "{8C9DBCF6-C2A9-4D55-BD48-AADF40240336}",
+                    p => p.Project.Guid == "{A1A2656E-4DC0-42CF-A0C2-4D0B66CDDB9B}");
+            solutionInfo.NestedSection.Dirs
+                .Should()
+                .ContainSingle(d => d.Guid == "{8C9DBCF6-C2A9-4D55-BD48-AADF40240336}")
+                .Which.NestedProjects
+                .Should()
+                .Satisfy(p => p.Project.Guid == expectedProjectGuids[1]);
+            solutionInfo.NestedSection.Dirs
+                .Should()
+                .ContainSingle(p => p.Guid == "{8C9DBCF6-C2A9-4D55-BD48-AADF40240336}")
+                .Which.NestedProjects
+                .Should()
+                .Satisfy(p => p.Project.Guid == expectedProjectGuids[1]);
+            solutionInfo.NestedSection.Dirs
+                .Should()
+                .ContainSingle(d => d.Guid == "{8C9DBCF6-C2A9-4D55-BD48-AADF40240336}")
+                .Which.NestedProjects
+                .Should()
+                .Satisfy(p => p.Project.Guid == expectedProjectGuids[1]);
+            solutionInfo.NestedSection.Dirs
+                .Should()
+                .ContainSingle(d => d.Name == "SolutionB")
+                .Which.NestedProjects
+                .Should().HaveCount(3)
+                .And
+                .Satisfy(p => p.Project.Name == "Inner Solution Items",
+                    p => p.Project.Guid == "{8C9DBCF6-C2A9-4D55-BD48-AADF40240336}",
+                    p => p.Project.Guid == expectedProjectGuids[0])
+                .And
+                .ContainSingle(p => p.Project.Name == "Inner Solution Items")
+                .Which.Project.ProjectInfo.All
+                .Should().Contain("2.txt");
+
+            solutionInfo.SolutionPlatformsSection.Lines.Should()
+                .BeEquivalentTo(expectedSolutionPlatforms, options => options.WithoutStrictOrdering());
+
+            solutionInfo.ProjectPlatformsSection.Lines.Should()
+                .BeEquivalentTo(expectedProjectPlatforms, options => options.WithoutStrictOrdering());
+        }
+
+        [Fact]
+        // ReSharper disable once InconsistentNaming
         public void MergeSolutionsAB()
         {
             var outDir = Path.Combine(Path.GetTempPath(), nameof(MergeSolutionsTests));
             RecursiveDelete(new DirectoryInfo(outDir));
             Directory.CreateDirectory(outDir);
-            var outSolutionName = "out.sln";
+            const string outSolutionName = "out.sln";
 
             var solutionPaths = new[] {"TestData/SolutionA/SolutionA.sln", "TestData/SolutionB/SolutionB.sln"};
 
@@ -207,7 +295,7 @@ namespace MergeSolutions.Tests
             var outDir = Path.Combine(Path.GetTempPath(), nameof(MergeSolutionsTests));
             RecursiveDelete(new DirectoryInfo(outDir));
             Directory.CreateDirectory(outDir);
-            var outSolutionName = "out.sln";
+            const string outSolutionName = "out.sln";
 
             var solutionPaths = new[] {"TestData/SolutionA/SolutionA.sln", "TestData/SolutionB/SolutionB.sln"};
 
@@ -216,15 +304,7 @@ namespace MergeSolutions.Tests
             var mergedSolution = SolutionInfo.MergeSolutions(Path.GetFileNameWithoutExtension(outputSolutionPath),
                 Path.GetDirectoryName(outputSolutionPath) ?? "",
                 out _,
-                project =>
-                {
-                    if (project.Name == "InSolutionFolderClassLibraryB")
-                    {
-                        return false;
-                    }
-
-                    return true;
-                },
+                project => project.Name is not "InSolutionFolderClassLibraryB",
                 null,
                 solutionPaths.Select(n => SolutionInfo.Parse(n)).ToArray());
             mergedSolution.Save();
@@ -238,15 +318,7 @@ namespace MergeSolutions.Tests
             mergedSolution = SolutionInfo.MergeSolutions(Path.GetFileNameWithoutExtension(outputSolutionPath),
                 Path.GetDirectoryName(outputSolutionPath) ?? "",
                 out _,
-                project =>
-                {
-                    if (project.SolutionName == "SolutionA" && project.Name == "InDiskFolderClassLibrary")
-                    {
-                        return false;
-                    }
-
-                    return true;
-                },
+                project => project.SolutionName is not "SolutionA" || project.Name is not "InDiskFolderClassLibrary",
                 null,
                 solutionPaths.Select(n => SolutionInfo.Parse(n)).ToArray());
             mergedSolution.Save();
@@ -282,7 +354,7 @@ namespace MergeSolutions.Tests
                 .Contain(p => p.Key == "Release|Any CPU" && p.Value == "Release|Any CPU");
         }
 
-        private void RecursiveDelete(DirectoryInfo baseDir)
+        private static void RecursiveDelete(DirectoryInfo baseDir)
         {
             if (!baseDir.Exists)
             {
