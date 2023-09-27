@@ -96,9 +96,10 @@ namespace MergeSolutions.Core.Parsers
         public static SolutionInfo Parse(string slnPath, string? rootDir = null, string? overrideName = null)
         {
             rootDir ??= Environment.CurrentDirectory;
-            if (!Path.IsPathFullyQualified(slnPath))
+
+            if (!TryGetPathToExistingSolution(slnPath, rootDir, out slnPath))
             {
-                slnPath = Path.Combine(rootDir, slnPath);
+                throw new FileNotFoundException("Solution does not exist.", slnPath);
             }
 
             var slnText = File.ReadAllText(slnPath);
@@ -119,6 +120,17 @@ namespace MergeSolutions.Core.Parsers
             sln.RelativePath = Path.GetRelativePath(rootDir, slnPath);
 
             return sln;
+        }
+
+        public static bool TryGetPathToExistingSolution(string path, string? rootDir, out string slnPath)
+        {
+            rootDir ??= Environment.CurrentDirectory;
+
+            slnPath = !Path.IsPathFullyQualified(path)
+                ? Path.Combine(rootDir, path)
+                : path;
+
+            return File.Exists(slnPath);
         }
 
         public void Save()

@@ -28,120 +28,118 @@
         /// </summary>
         private void InitializeComponent()
         {
-            this.treeViewSolutions = new System.Windows.Forms.TreeView();
-            this.buttonAppendSolution = new System.Windows.Forms.Button();
-            this.buttonReset = new System.Windows.Forms.Button();
-            this.buttonOpenPlan = new System.Windows.Forms.Button();
-            this.buttonRunMerge = new System.Windows.Forms.Button();
-            this.buttonSaveMergePlan = new System.Windows.Forms.Button();
-            this.labelMergePlanPath = new System.Windows.Forms.Label();
-            this.labelMergedSolutionPath = new System.Windows.Forms.Label();
-            this.SuspendLayout();
+            treeViewSolutions = new TreeView();
+            buttonAppendSolution = new Button();
+            buttonReset = new Button();
+            buttonOpenPlan = new Button();
+            buttonRunMerge = new Button();
+            buttonSaveMergePlan = new Button();
+            labelMergePlanPath = new Label();
+            labelMergedSolutionPath = new Label();
+            SuspendLayout();
             // 
             // treeViewSolutions
             // 
-            this.treeViewSolutions.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
-            | System.Windows.Forms.AnchorStyles.Left) 
-            | System.Windows.Forms.AnchorStyles.Right)));
-            this.treeViewSolutions.Location = new System.Drawing.Point(161, 41);
-            this.treeViewSolutions.Name = "treeViewSolutions";
-            this.treeViewSolutions.Size = new System.Drawing.Size(611, 445);
-            this.treeViewSolutions.TabIndex = 4;
-            this.treeViewSolutions.AfterLabelEdit += new System.Windows.Forms.NodeLabelEditEventHandler(this.treeViewSolutions_AfterLabelEdit);
-            this.treeViewSolutions.AfterCheck += new System.Windows.Forms.TreeViewEventHandler(this.treeViewSolutions_AfterCheck);
+            treeViewSolutions.Anchor = AnchorStyles.Top | AnchorStyles.Bottom | AnchorStyles.Left | AnchorStyles.Right;
+            treeViewSolutions.Location = new Point(161, 41);
+            treeViewSolutions.Name = "treeViewSolutions";
+            treeViewSolutions.Size = new Size(611, 445);
+            treeViewSolutions.TabIndex = 4;
+            treeViewSolutions.AfterLabelEdit += treeViewSolutions_AfterLabelEdit;
+            treeViewSolutions.AfterCheck += treeViewSolutions_AfterCheck;
             // 
             // buttonAppendSolution
             // 
-            this.buttonAppendSolution.Location = new System.Drawing.Point(11, 41);
-            this.buttonAppendSolution.Name = "buttonAppendSolution";
-            this.buttonAppendSolution.Size = new System.Drawing.Size(143, 23);
-            this.buttonAppendSolution.TabIndex = 6;
-            this.buttonAppendSolution.Text = "Append solution";
-            this.buttonAppendSolution.UseVisualStyleBackColor = true;
-            this.buttonAppendSolution.Click += new System.EventHandler(this.buttonAppendSolution_Click);
+            buttonAppendSolution.Location = new Point(11, 41);
+            buttonAppendSolution.Name = "buttonAppendSolution";
+            buttonAppendSolution.Size = new Size(143, 23);
+            buttonAppendSolution.TabIndex = 6;
+            buttonAppendSolution.Text = "Append solution";
+            buttonAppendSolution.UseVisualStyleBackColor = true;
+            buttonAppendSolution.Click += buttonAppendSolution_Click;
             // 
             // buttonReset
             // 
-            this.buttonReset.Location = new System.Drawing.Point(12, 12);
-            this.buttonReset.Name = "buttonReset";
-            this.buttonReset.Size = new System.Drawing.Size(143, 23);
-            this.buttonReset.TabIndex = 7;
-            this.buttonReset.Text = "Reset merge plan";
-            this.buttonReset.UseVisualStyleBackColor = true;
-            this.buttonReset.Click += new System.EventHandler(this.buttonReset_Click);
+            buttonReset.Location = new Point(12, 12);
+            buttonReset.Name = "buttonReset";
+            buttonReset.Size = new Size(143, 23);
+            buttonReset.TabIndex = 7;
+            buttonReset.Text = "Reset merge plan";
+            buttonReset.UseVisualStyleBackColor = true;
+            buttonReset.Click += buttonReset_Click;
             // 
             // buttonOpenPlan
             // 
-            this.buttonOpenPlan.Location = new System.Drawing.Point(161, 12);
-            this.buttonOpenPlan.Name = "buttonOpenPlan";
-            this.buttonOpenPlan.Size = new System.Drawing.Size(143, 23);
-            this.buttonOpenPlan.TabIndex = 8;
-            this.buttonOpenPlan.Text = "Open merge plan";
-            this.buttonOpenPlan.UseVisualStyleBackColor = true;
-            this.buttonOpenPlan.Click += new System.EventHandler(this.buttonOpenPlan_Click);
+            buttonOpenPlan.Location = new Point(161, 12);
+            buttonOpenPlan.Name = "buttonOpenPlan";
+            buttonOpenPlan.Size = new Size(143, 23);
+            buttonOpenPlan.TabIndex = 8;
+            buttonOpenPlan.Text = "Open merge plan";
+            buttonOpenPlan.UseVisualStyleBackColor = true;
+            buttonOpenPlan.Click += buttonOpenPlan_Click;
             // 
             // buttonRunMerge
             // 
-            this.buttonRunMerge.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left)));
-            this.buttonRunMerge.Location = new System.Drawing.Point(12, 526);
-            this.buttonRunMerge.Name = "buttonRunMerge";
-            this.buttonRunMerge.Size = new System.Drawing.Size(143, 23);
-            this.buttonRunMerge.TabIndex = 9;
-            this.buttonRunMerge.Text = "Create merged solution";
-            this.buttonRunMerge.UseVisualStyleBackColor = true;
-            this.buttonRunMerge.Click += new System.EventHandler(this.buttonRunMerge_Click);
+            buttonRunMerge.Anchor = AnchorStyles.Bottom | AnchorStyles.Left;
+            buttonRunMerge.Location = new Point(12, 526);
+            buttonRunMerge.Name = "buttonRunMerge";
+            buttonRunMerge.Size = new Size(143, 23);
+            buttonRunMerge.TabIndex = 9;
+            buttonRunMerge.Text = "Create merged solution";
+            buttonRunMerge.UseVisualStyleBackColor = true;
+            buttonRunMerge.Click += buttonRunMerge_Click;
             // 
             // buttonSaveMergePlan
             // 
-            this.buttonSaveMergePlan.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left)));
-            this.buttonSaveMergePlan.Location = new System.Drawing.Point(12, 496);
-            this.buttonSaveMergePlan.Name = "buttonSaveMergePlan";
-            this.buttonSaveMergePlan.Size = new System.Drawing.Size(142, 23);
-            this.buttonSaveMergePlan.TabIndex = 10;
-            this.buttonSaveMergePlan.Text = "Save merge plan";
-            this.buttonSaveMergePlan.UseVisualStyleBackColor = true;
-            this.buttonSaveMergePlan.Click += new System.EventHandler(this.buttonSaveMergePlan_Click);
+            buttonSaveMergePlan.Anchor = AnchorStyles.Bottom | AnchorStyles.Left;
+            buttonSaveMergePlan.Location = new Point(12, 496);
+            buttonSaveMergePlan.Name = "buttonSaveMergePlan";
+            buttonSaveMergePlan.Size = new Size(142, 23);
+            buttonSaveMergePlan.TabIndex = 10;
+            buttonSaveMergePlan.Text = "Save merge plan";
+            buttonSaveMergePlan.UseVisualStyleBackColor = true;
+            buttonSaveMergePlan.Click += buttonSaveMergePlan_Click;
             // 
             // labelMergePlanPath
             // 
-            this.labelMergePlanPath.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left)));
-            this.labelMergePlanPath.AutoSize = true;
-            this.labelMergePlanPath.Location = new System.Drawing.Point(161, 500);
-            this.labelMergePlanPath.Name = "labelMergePlanPath";
-            this.labelMergePlanPath.Size = new System.Drawing.Size(113, 15);
-            this.labelMergePlanPath.TabIndex = 11;
-            this.labelMergePlanPath.Text = "labelMergePlanPath";
+            labelMergePlanPath.Anchor = AnchorStyles.Bottom | AnchorStyles.Left;
+            labelMergePlanPath.AutoSize = true;
+            labelMergePlanPath.Location = new Point(161, 500);
+            labelMergePlanPath.Name = "labelMergePlanPath";
+            labelMergePlanPath.Size = new Size(113, 15);
+            labelMergePlanPath.TabIndex = 11;
+            labelMergePlanPath.Text = "labelMergePlanPath";
             // 
             // labelMergedSolutionPath
             // 
-            this.labelMergedSolutionPath.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left)));
-            this.labelMergedSolutionPath.AutoSize = true;
-            this.labelMergedSolutionPath.Location = new System.Drawing.Point(161, 530);
-            this.labelMergedSolutionPath.Name = "labelMergedSolutionPath";
-            this.labelMergedSolutionPath.Size = new System.Drawing.Size(141, 15);
-            this.labelMergedSolutionPath.TabIndex = 12;
-            this.labelMergedSolutionPath.Text = "labelMergedSolutionPath";
+            labelMergedSolutionPath.Anchor = AnchorStyles.Bottom | AnchorStyles.Left;
+            labelMergedSolutionPath.AutoSize = true;
+            labelMergedSolutionPath.Location = new Point(161, 530);
+            labelMergedSolutionPath.Name = "labelMergedSolutionPath";
+            labelMergedSolutionPath.Size = new Size(141, 15);
+            labelMergedSolutionPath.TabIndex = 12;
+            labelMergedSolutionPath.Text = "labelMergedSolutionPath";
             // 
             // MainForm
             // 
-            this.AutoScaleDimensions = new System.Drawing.SizeF(7F, 15F);
-            this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-            this.ClientSize = new System.Drawing.Size(784, 561);
-            this.Controls.Add(this.labelMergedSolutionPath);
-            this.Controls.Add(this.labelMergePlanPath);
-            this.Controls.Add(this.buttonSaveMergePlan);
-            this.Controls.Add(this.buttonRunMerge);
-            this.Controls.Add(this.buttonOpenPlan);
-            this.Controls.Add(this.buttonReset);
-            this.Controls.Add(this.buttonAppendSolution);
-            this.Controls.Add(this.treeViewSolutions);
-            this.MinimumSize = new System.Drawing.Size(800, 377);
-            this.Name = "MainForm";
-            this.Text = "Merge Solutions UI";
-            this.Load += new System.EventHandler(this.MainForm_Load);
-            this.ResumeLayout(false);
-            this.PerformLayout();
-
+            AutoScaleDimensions = new SizeF(7F, 15F);
+            AutoScaleMode = AutoScaleMode.Font;
+            ClientSize = new Size(784, 561);
+            Controls.Add(labelMergedSolutionPath);
+            Controls.Add(labelMergePlanPath);
+            Controls.Add(buttonSaveMergePlan);
+            Controls.Add(buttonRunMerge);
+            Controls.Add(buttonOpenPlan);
+            Controls.Add(buttonReset);
+            Controls.Add(buttonAppendSolution);
+            Controls.Add(treeViewSolutions);
+            MinimumSize = new Size(800, 377);
+            Name = "MainForm";
+            StartPosition = FormStartPosition.CenterScreen;
+            Text = "Merge Solutions UI";
+            Load += MainForm_Load;
+            ResumeLayout(false);
+            PerformLayout();
         }
 
         #endregion

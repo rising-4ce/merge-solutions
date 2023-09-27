@@ -8,5 +8,10 @@ namespace MergeSolutions.Core.Services
         {
             return SolutionInfo.Parse(path, rootDir);
         }
+
+        public bool SolutionExists(string path, string? rootDir)
+        {
+            return SolutionInfo.TryGetPathToExistingSolution(path, rootDir, out _);
+        }
     }
 }

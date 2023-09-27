@@ -1,6 +1,7 @@
 using System.Runtime.CompilerServices;
 using MergeSolutions.Core;
 using MergeSolutions.Core.Services;
+using MergeSolutions.UI.Helpers;
 using Microsoft.Extensions.DependencyInjection;
 
 // ReSharper disable LocalizableElement
@@ -11,15 +12,25 @@ namespace MergeSolutions.UI
     {
         public static IServiceProvider ServiceProvider { get; private set; } = null!;
 
-        public static void ShowExceptionMessage(string message, Exception? exception, string? caption = null)
+        public static void ShowExceptionMessage(IWin32Window owner, string message, Exception? exception, string? caption = null)
         {
-            MessageBox.Show(@$"{message} 
+            using (_ = new DialogCenteringService(owner))
+            {
+                ShowExceptionMessage(message, exception, caption, owner);
+            }
+        }
+
+        public static void ShowExceptionMessage(string message, Exception? exception, string? caption = null,
+            IWin32Window? owner = null)
+        {
+            MessageBox.Show(owner, @$"{message} 
 
 {exception?.Message}
 {exception?.InnerException?.Message}",
                 caption ?? "Error",
                 MessageBoxButtons.OK,
-                MessageBoxIcon.Error);
+                MessageBoxIcon.Error,
+                MessageBoxDefaultButton.Button1);
         }
 
         private static void ApplicationOnThreadException(object sender, ThreadExceptionEventArgs args)

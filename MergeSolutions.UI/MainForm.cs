@@ -1,6 +1,7 @@
 using MergeSolutions.Core;
 using MergeSolutions.Core.Models;
 using MergeSolutions.Core.Services;
+using MergeSolutions.UI.Helpers;
 
 // ReSharper disable LocalizableElement
 
@@ -151,7 +152,7 @@ namespace MergeSolutions.UI
             }
             catch (Exception e)
             {
-                Program.ShowExceptionMessage(message ?? "Operation failed", e, caption ?? "Operation failed");
+                Program.ShowExceptionMessage(this, message ?? "Operation failed", e, caption ?? "Operation failed");
             }
             finally
             {
@@ -183,14 +184,30 @@ namespace MergeSolutions.UI
                 treeViewSolutions.BeginUpdate();
                 treeViewSolutions.Nodes.Clear();
                 treeViewSolutions.CheckBoxes = true;
-                foreach (var solutionEntity in _mergePlan.Solutions.OrderBy(s => s.NodeName))
+
+                var unloadedPathsWithName = new List<string>();
+
+                _mergePlan.Solutions = _mergePlan.Solutions.Where(se =>
                 {
-                    if (solutionEntity.RelativePath == null)
+                    if (se.RelativePath is null)
                     {
-                        continue;
+                        return false;
                     }
 
-                    var solutionInfo = _solutionService.ParseSolution(solutionEntity.RelativePath, _mergePlan.RootDir);
+                    if (_solutionService.SolutionExists(se.RelativePath, _mergePlan.RootDir))
+                    {
+                        return true;
+                    }
+
+                    unloadedPathsWithName.Add(se.NodeName is null
+                        ? se.RelativePath
+                        : $"{se.RelativePath} ({se.NodeName})");
+                    return false;
+                }).ToList();
+
+                foreach (var solutionEntity in _mergePlan.Solutions.OrderBy(s => s.NodeName))
+                {
+                    var solutionInfo = _solutionService.ParseSolution(solutionEntity.RelativePath!, _mergePlan.RootDir);
                     solutionEntity.NodeName ??= solutionInfo.Name;
                     var solutionTreeNode = new SolutionTreeNode(solutionEntity);
 
@@ -237,6 +254,18 @@ namespace MergeSolutions.UI
                         solutionTreeNode.Expand();
                     }
                 }
+
+                if (unloadedPathsWithName.Count is 0)
+                {
+                    return;
+                }
+
+                using (_ = new DialogCenteringService(this))
+                {
+                    Program.ShowExceptionMessage(this, "The following solution files are missing:\n" +
+                                                       $"{string.Join('\n', unloadedPathsWithName)}",
+                        null, "Solutions not loaded");
+                }
             }
             finally
             {
@@ -275,7 +304,7 @@ namespace MergeSolutions.UI
                     if (!projectNode.Checked)
                     {
                         excludedProjects.Add(new KeyValuePair<string, string>(solutionTreeNode.SolutionEntity.RelativePath!,
-                            (string)projectNode.Tag));
+                            (string) projectNode.Tag));
                     }
                 }
             }
