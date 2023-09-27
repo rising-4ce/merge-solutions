@@ -70,18 +70,20 @@ namespace MergeSolutions.Core.Models
                     return false;
                 }
 
+                var isSameLocation = x?.Location.Equals(y?.Location, StringComparison.OrdinalIgnoreCase) is true;
+
                 if (x is Project)
                 {
-                    return x.Location == y?.Location;
+                    return isSameLocation;
                 }
 
-                return x?.Guid == y?.Guid && x?.Location == y?.Location;
+                return x?.Guid == y?.Guid && isSameLocation;
             }
 
             public int GetHashCode(BaseProject x)
             {
                 return x is Project
-                    ? x.Location.GetHashCode()
+                    ? x.Location.ToLowerInvariant().GetHashCode()
                     : (x.Guid + x.Location).GetHashCode();
             }
         }
